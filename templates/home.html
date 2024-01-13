@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>IPL Access</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <h1>IPL Data HQ</h1>
+    <h1>Enter the name of a player, team, ground or umpire/referee:</h1>
+    <form method="POST">
+        <input type="text" name="user_input" />
+        <input type="submit" value="Search" />
+    </form>
+</body>
+</html>
