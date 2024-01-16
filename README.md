@@ -1,2 +1,2 @@
-# IPL-Stats-Access
+# IPL-Stats-Explorer
 IPL Database Access
