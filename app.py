@@ -42,15 +42,19 @@ def searchresults(user_input):
 @app.route('/profile_page/<column_name>')
 def profile_page(column_name):
     cell_value = request.args.get('value')
-    df = pd.DataFrame()
-
+    df_batter = pd.DataFrame()
+    df_bowler = pd.DataFrame()
     if column_name == 'Players':
-        df = pd.DataFrame(data_manipulation.batter_stats(cell_value))
+        df_batter = pd.DataFrame(data_manipulation.batter_stats(cell_value))
+        df_bowler = pd.DataFrame(data_manipulation.bowler_stats(cell_value))
+    else:
+        df_batter = pd.DataFrame(data_manipulation.x_batter_stats(cell_value))
+        df_bowler = pd.DataFrame(data_manipulation.x_bowler_stats(cell_value))
 
     # Convert the DataFrame to HTML
-    table_html = df.to_html(classes='table')
-
-    return render_template('profile_page.html', column_name=column_name, cell_value=cell_value, table_html=table_html)
+    table_html_batter = df_batter.to_html(classes='table')
+    table_html_bowler = df_bowler.to_html(classes='table')
+    return render_template('profile_page.html', column_name=column_name, cell_value=cell_value, table_html_batter=table_html_batter, table_html_bowler = table_html_bowler)
 
 
 
