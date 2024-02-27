@@ -10,9 +10,6 @@
         <h1>Stats Filter Page</h1>
         <p>Cell Value: {{ cell_value }}</p>
 
-        <!-- Add your content or form for stats filtering here -->
-
-        <!-- Example: Go back to the profile page -->
         <a href="{{ url_for('profile_page', column_name='YourColumnName', value=cell_value) }}" class="btn btn-primary">Back to Profile Page</a>
 
         <form action="{{ url_for('process_stats_filter', cell_value=cell_value) }}" method="POST">

@@ -34,11 +34,12 @@ def profile_page(column_name):
     df_batter = pd.DataFrame()
     df_bowler = pd.DataFrame()
     if column_name == 'Players':
-        df_batter = pd.DataFrame(data_manipulation.batter_stats(cell_value))
-        df_bowler = pd.DataFrame(data_manipulation.bowler_stats(cell_value))
+        first_match_date, last_match_date = data_manipulation.get_first_and_last_match_dates(cell_value)
+        df_batter = pd.DataFrame(data_manipulation.batter_stats(cell_value, first_match_date, last_match_date)) # Add Start and End Date
+        df_bowler = pd.DataFrame(data_manipulation.bowler_stats(cell_value, first_match_date, last_match_date)) # Add Start and End Date
     else:
-        df_batter = pd.DataFrame(data_manipulation.x_batter_stats(cell_value))
-        df_bowler = pd.DataFrame(data_manipulation.x_bowler_stats(cell_value))
+        df_batter = pd.DataFrame(data_manipulation.x_batter_stats(cell_value)) # Add Start and End Date
+        df_bowler = pd.DataFrame(data_manipulation.x_bowler_stats(cell_value)) # Add Start and End Date
 
     # Convert the DataFrame to HTML
     table_html_batter = df_batter.to_html(classes='table')
