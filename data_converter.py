@@ -81,6 +81,3 @@ for match_id, bowler_appearances in results:
 print(counter)
 # Close the connection
 conn.close()
-
-
-

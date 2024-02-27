@@ -163,7 +163,7 @@ def batter_stats(player):
     batter_dict['Matches'] = [num_matches(player)]
     batter_dict['Innings'] = [batter_innings(player)]
     batter_dict['Runs'] = [player_runs]
-    batter_dict['Bowls'] = [bowls_played(player)]
+    batter_dict['Balls'] = [bowls_played(player)]
     batter_dict['Average'] = [batting_avg]
     batter_dict['Not Outs'] = [batter_innings(player) - count]
     
@@ -250,7 +250,7 @@ def bowler_stats(player):
     bowler_dict['Innings'] = [bowler_innings(player)]
     bowler_dict['Runs'] = [player_runs]
     bowler_dict['Wickets'] = [count]
-    bowler_dict['Bowls'] = [total_bowls(player)]
+    bowler_dict['Balls'] = [total_bowls(player)]
     bowler_dict['Average'] = [bowling_avg]
     
     # Close the connection

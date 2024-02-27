@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Detailed Filtered Stats Page</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="content">
+        <h1>Detailed Filtered Stats Page</h1>
+        <p>Playing Team: {{ playing_team }}</p>
+        <p>Opposition: {{ opposition }}</p>
+        <p>Venue: {{ ', '.join(venue) }}</p>
+        <p>Host Team: {{ host_team }}</p>
+        <p>Ground: {{ ground }}</p>
+        <p>Start Date: {{ start_date }}</p>
+        <p>End Date: {{ end_date }}</p>
+        <p>Season: {{ season }}</p>
+        <p>Match Result: {{ ', '.join(match_result) }}</p>
+        <p>View Format: {{ view_format }}</p>
+        <p>View Type: {{ view_type }}</p>
+    </div>
+</body>
+</html>

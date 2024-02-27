@@ -141,3 +141,22 @@ font-size: 16px;
     color: #0056b3; /* Darker blue on hover */
     text-decoration: underline;
 }
+
+
+.Profile-to-Stats-Filter {
+    background-color: #04AA6D;
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: 5px;
+    color: #fff;
+}
+
+.Profile-to-Stats-Filter a {
+    text-decoration: none;
+    color: white;
+}
+
+.Profile-to-Stats-Filter {
+    background-color: #04715D; /* Change the color on hover */
+    color: #fff;
+}

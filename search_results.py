@@ -149,7 +149,6 @@ def filter_dict_by_search(substring):
         filtered_list = [item for item in value_list if substring.lower() in item.lower()]
         # Assign the filtered list to the corresponding key in the new dictionary
         filtered_dict[key] = filtered_list
-
     return filtered_dict
 
 

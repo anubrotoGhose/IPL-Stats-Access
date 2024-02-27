@@ -13,11 +13,15 @@
         <div id="batter-stats">
             {{ table_html_batter|safe }}
         </div>
-
+        <!--Bowler Stats-->
         <h2>Bowling Statistics</h2>
         <div id="bowling-stats">
             {{ table_html_bowler|safe }}
         </div>
+        
     </div>
+    <div class="Profile-to-Stats-Filter">
+        <a href="{{ url_for('stats_filter', cell_value=cell_value) }}" class="btn btn-primary">Go to Stats Filter Page</a>
+    </div>    
 </body>
 </html>

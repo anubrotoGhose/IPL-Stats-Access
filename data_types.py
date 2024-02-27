@@ -14,7 +14,7 @@ tables = cursor.fetchall()
 for table in tables:
     table_name = table[0]
     print(f"Table: {table_name}")
-    
+     
     # Fetch the column names and datatypes for each table
     cursor.execute(f"PRAGMA table_info({table_name});")
     columns = cursor.fetchall()

@@ -5,24 +5,13 @@ import data_manipulation
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 
-def convert_dict_to_df(data):
-    # Find the maximum length of the lists in the dictionary
-    max_length = max(len(lst) for lst in data.values())
-
-    # Pad shorter lists with None
-    for key in data:
-        data[key] += [None] * (max_length - len(data[key]))
-
-    # Convert the dictionary into a pandas DataFrame
-    df = pd.DataFrame(data)
-    return df
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
     if request.method == 'POST':
         user_input = request.form['user_input']
         search_dict = search_results.filter_dict_by_search(user_input)
-        
+
         # Store search_dict in session
         session['search_dict'] = search_dict
 
@@ -56,6 +45,46 @@ def profile_page(column_name):
     table_html_bowler = df_bowler.to_html(classes='table')
     return render_template('profile_page.html', column_name=column_name, cell_value=cell_value, table_html_batter=table_html_batter, table_html_bowler = table_html_bowler)
 
+@app.route('/stats_filter/<cell_value>')
+def stats_filter(cell_value):
+    # Add logic to process the cell_value or redirect to another page
+    # print(f"Cell Value: {cell_value}")
+    
+    # You can render a template or return the processed data directly
+
+    # For example:
+    return render_template('stats_filter.html', cell_value=cell_value)
+
+@app.route('/process_stats_filter', methods=['POST'])
+def process_stats_filter():
+    # Retrieve form data
+    playing_team = request.form.get('playing_team')
+    opposition = request.form.get('opposition')
+    venue = request.form.getlist('venue')
+    host_team = request.form.get('host_team')
+    ground = request.form.get('ground')
+    start_date = request.form.get('start_date')
+    end_date = request.form.get('end_date')
+    season = request.form.get('season')
+    match_result = request.form.getlist('match_result')
+    view_format = request.form.get('view_format')
+    view_type = request.form.get('view_type')
+
+    # You can process the form data as needed (e.g., filter data from your database)
+
+    # Render the detailed_filtered_stats_page and pass the selected values
+    return render_template('detailed_filtered_stats_page.html', 
+                           playing_team=playing_team, 
+                           opposition=opposition, 
+                           venue=venue, 
+                           host_team=host_team, 
+                           ground=ground, 
+                           start_date=start_date, 
+                           end_date=end_date, 
+                           season=season, 
+                           match_result=match_result, 
+                           view_format=view_format, 
+                           view_type=view_type)
 
 
 if __name__ == '__main__':
