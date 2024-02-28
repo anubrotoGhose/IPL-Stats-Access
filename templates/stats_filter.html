@@ -10,16 +10,18 @@
         <h1>Stats Filter Page</h1>
         <p>Cell Value: {{ cell_value }}</p>
 
-        <a href="{{ url_for('profile_page', column_name='YourColumnName', value=cell_value) }}" class="btn btn-primary">Back to Profile Page</a>
+        <a href="{{ url_for('profile_page', column_name=column_name, value=cell_value) }}" class="btn btn-primary">Back to Profile Page</a>
 
-        <form action="{{ url_for('process_stats_filter', cell_value=cell_value) }}" method="POST">
+        <form action="{{ url_for('process_stats_filter', cell_value=cell_value, column_name=column_name) }}" method="POST">
+            
             <!-- Playing Team -->
             <div class="form-group">
                 <label for="playing_team">Playing Team:</label>
                 <select id="playing_team" name="playing_team">
-                    <option value="CSK">CSK</option>
-                    <option value="MI">MI</option>
-                    <!-- Add more options as needed -->
+                    <option value="all" selected>All</option>
+                    {% for team in playing_teams %}
+                        <option value="{{ team }}">{{ team }}</option>
+                    {% endfor %}
                 </select>
             </div>
         
@@ -27,36 +29,10 @@
             <div class="form-group">
                 <label for="opposition">Opposition:</label>
                 <select id="opposition" name="opposition">
-                    <option value="CSK">CSK</option>
-                    <option value="MI">MI</option>
-                    <!-- Add more options as needed -->
-                </select>
-            </div>
-        
-            <!-- Home or Away -->
-            <div class="form-group">
-                <label>Home or Away:</label>
-                <div>
-                    <input type="checkbox" id="home_venue" name="venue" value="home_venue">
-                    <label for="home_venue">Home Venue</label>
-                </div>
-                <div>
-                    <input type="checkbox" id="away_venue" name="venue" value="away_venue">
-                    <label for="away_venue">Away (Home of Opposition)</label>
-                </div>
-                <div>
-                    <input type="checkbox" id="neutral_venue" name="venue" value="neutral_venue">
-                    <label for="neutral_venue">Neutral Venue</label>
-                </div>
-            </div>
-        
-            <!-- Host Team -->
-            <div class="form-group">
-                <label for="host_team">Host Team:</label>
-                <select id="host_team" name="host_team">
-                    <option value="CSK">CSK</option>
-                    <option value="MI">MI</option>
-                    <!-- Add more options as needed -->
+                    <option value="all" selected>All</option>
+                    {% for team in opposition_teams %}
+                        <option value="{{ team }}">{{ team }}</option>
+                    {% endfor %}
                 </select>
             </div>
         
@@ -64,30 +40,33 @@
             <div class="form-group">
                 <label for="ground">Ground:</label>
                 <select id="ground" name="ground">
-                    <option value="CSK">CSK</option>
-                    <option value="MI">MI</option>
-                    <!-- Add more options as needed -->
+                    <option value="all" selected>All</option>
+                    {% for venue in venue_lst %}
+                        <option value="{{ venue }}">{{ venue }}</option>
+                    {% endfor %}
                 </select>
             </div>
         
-            <!-- Starting date and End date -->
+            <!-- Starting date -->
             <div class="form-group">
                 <label for="start_date">Starting date:</label>
-                <input type="date" id="start_date" name="start_date">
+                <input type="date" id="start_date" name="start_date" value="{{ debut_date }}">
             </div>
         
+            <!-- End date -->
             <div class="form-group">
                 <label for="end_date">End date:</label>
-                <input type="date" id="end_date" name="end_date">
+                <input type="date" id="end_date" name="end_date" value="{{ last_match_date }}">
             </div>
         
             <!-- Season -->
             <div class="form-group">
                 <label for="season">Season:</label>
                 <select id="season" name="season">
-                    <option value="2008">2008</option>
-                    <option value="2022">2022</option>
-                    <!-- Add more options as needed -->
+                    <option value="all" selected>All</option>
+                    {% for season in seasons %}
+                        <option value="{{ season }}">{{ season }}</option>
+                    {% endfor %}
                 </select>
             </div>
         

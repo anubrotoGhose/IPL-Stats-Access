@@ -2,6 +2,111 @@ import sqlite3
 import numpy as np
 import pandas as pd
 
+import sqlite3
+
+
+def get_season(match_ID_list):
+    conn = sqlite3.connect('ipl_database.db')
+    cursor = conn.cursor()
+
+    # Convert the list of IDs to a tuple for the SQL query
+    match_ID_tuple = tuple(match_ID_list)
+
+    # Query to select venues for the given match IDs
+    query = f'''
+    SELECT Season
+    FROM ipl_match_list
+    WHERE ID IN {match_ID_tuple}
+    '''
+
+    # Execute the query
+    cursor.execute(query)
+    seasons = [row[0] for row in cursor.fetchall()]
+
+    conn.close()
+
+    return sorted(list(set(seasons)))
+
+def get_venues_for_matches(match_ID_list):
+    conn = sqlite3.connect('ipl_database.db')
+    cursor = conn.cursor()
+
+    # Convert the list of IDs to a tuple for the SQL query
+    match_ID_tuple = tuple(match_ID_list)
+
+    # Query to select venues for the given match IDs
+    query = f'''
+    SELECT Venue
+    FROM ipl_match_list
+    WHERE ID IN {match_ID_tuple}
+    '''
+
+    # Execute the query
+    cursor.execute(query)
+    venues = [row[0] for row in cursor.fetchall()]
+
+    conn.close()
+
+    return sorted(list(set(venues)))
+
+
+def player_input_filter_stats(player_name):
+    conn = sqlite3.connect('ipl_database.db')
+    cursor = conn.cursor()
+    # print("In input filter_stats")
+    # Define the SQL query to count the occurrences of the player's name in the Player_of_Match column
+    query = '''
+    SELECT debut_date, last_match_date,  match_ID_list, played_for_teams, played_against_teams
+    FROM ipl_player_list
+    WHERE name LIKE ?
+    '''
+
+    # Execute the query with the player's name as a parameter
+    cursor.execute(query, ('%' + player_name + '%',))
+    lst = [item for item in cursor.fetchone()]
+
+    conn.close()
+
+    return lst
+
+def count_player_of_match(player_name):
+    conn = sqlite3.connect('ipl_database.db')
+    cursor = conn.cursor()
+
+    # Define the SQL query to count the occurrences of the player's name in the Player_of_Match column
+    query = '''
+    SELECT COUNT(*)
+    FROM ipl_match_list
+    WHERE Player_of_Match LIKE ?
+    '''
+
+    # Execute the query with the player's name as a parameter
+    cursor.execute(query, ('%' + player_name + '%',))
+    count = cursor.fetchone()[0]
+
+    conn.close()
+
+    return count
+
+def get_match_ids(player_name, date):
+    conn = sqlite3.connect('ipl_database.db')
+    cursor = conn.cursor()
+
+    # Define the SQL query to retrieve the match IDs based on the provided player name and date
+    query = f'''
+    SELECT ID
+    FROM ipl_match_list
+    WHERE date = ? AND (Team1Players LIKE '%{player_name}%' OR Team2Players LIKE '%{player_name}%')
+    '''
+
+    # Execute the query
+    cursor.execute(query, (date,))
+    match_ids = [row[0] for row in cursor.fetchall()]
+
+    conn.close()
+
+    return match_ids
+
 def get_match_ids_and_teams_for_player(player_name):
     conn = sqlite3.connect('ipl_database.db')
     cursor = conn.cursor()
@@ -17,7 +122,7 @@ def get_match_ids_and_teams_for_player(player_name):
 
     result = cursor.fetchall()
 
-    print(len(result))
+    # print(len(result))
     for match_id, date, team1, team2, pl1, pl2 in result:
         id_list.append(match_id)
         date_list.append(date)
@@ -81,8 +186,8 @@ def fetch_player_stats(player_name):
     innings_played = find_batting_positions(player_name)
     total_balls_bowled = total_bowls(player_name, start_date, end_date)
     total_matches = num_matches(player_name, start_date, end_date)
-    print(sum(innings_played))
-    print({'Innings': innings_played, 'Balls': total_balls_bowled, 'Matches': total_matches})
+    # print(sum(innings_played))
+    # print({'Innings': innings_played, 'Balls': total_balls_bowled, 'Matches': total_matches})
     return {'Innings': innings_played, 'Balls': total_balls_bowled, 'Matches': total_matches}
 
 def classify_player(player_stats):
@@ -90,7 +195,12 @@ def classify_player(player_stats):
     
     # Calculate the percentage of innings played at each batting position
     total_innings = sum(player_stats['Innings'])
-    percentages = [innings / total_innings * 100 for innings in player_stats['Innings']]
+    percentages = []
+    if total_innings == 0:
+        percentages = [0] * 11
+    else:
+        percentages = [innings / total_innings * 100 for innings in player_stats['Innings']]
+        
     
     if percentages[0] + percentages[1] >= 80 and balls_bowled_per_match < 5:
         return "Opening Batsman"
@@ -223,16 +333,16 @@ def bowls_played(player_name, start_date, end_date):
     SELECT COUNT(*) AS TotalBatterAppearances
     FROM ipl_ball_by_ball AS b
     JOIN ipl_match_list AS m ON b.ID = m.ID
-    WHERE b.batter = ? AND m.Date BETWEEN ? AND ?
+    WHERE b.batter = ? AND m.Date BETWEEN ? AND ? AND (b.extra_type IS NULL OR b.extra_type = 'noballs')
     '''
 
     cursor.execute(query, (player_name, start_date, end_date))
     result = cursor.fetchone()
-    total_batter_appearances = result[0]
+    balls_faced = result[0]
 
     conn.close()
 
-    return total_batter_appearances
+    return balls_faced
 
 def total_bowls(player_name, start_date, end_date):
     conn = sqlite3.connect('./ipl_database.db')
@@ -242,7 +352,7 @@ def total_bowls(player_name, start_date, end_date):
     SELECT COUNT(*) AS TotalBowlsPlayed
     FROM ipl_ball_by_ball AS b
     JOIN ipl_match_list AS m ON b.ID = m.ID
-    WHERE b.bowler = ? AND m.Date BETWEEN ? AND ?
+    WHERE b.bowler = ? AND m.Date BETWEEN ? AND ? AND b.extra_type IS NULL
     '''
 
     cursor.execute(query, (player_name, start_date, end_date))
@@ -305,9 +415,7 @@ def batter_stats(player_name, start_date, end_date):
     return batter_dict
 
 def bowler_runs(player_name, start_date, end_date):
-    import sqlite3
 
-    # Connect to the SQLite database
     conn = sqlite3.connect('./ipl_database.db')
     cursor = conn.cursor()
 

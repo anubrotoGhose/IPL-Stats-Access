@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, session
 import pandas as pd
 import search_results
 import data_manipulation
+import ast
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 
@@ -46,23 +47,28 @@ def profile_page(column_name):
     table_html_bowler = df_bowler.to_html(classes='table')
     return render_template('profile_page.html', column_name=column_name, cell_value=cell_value, table_html_batter=table_html_batter, table_html_bowler = table_html_bowler)
 
-@app.route('/stats_filter/<cell_value>')
-def stats_filter(cell_value):
-    # Add logic to process the cell_value or redirect to another page
-    # print(f"Cell Value: {cell_value}")
+@app.route('/stats_filter/<cell_value>/<column_name>')
+def stats_filter(cell_value, column_name):
+    if column_name == 'Players':
+        # Assuming data_manipulation.player_input_filter_stats returns a tuple containing the required data
+        x = data_manipulation.player_input_filter_stats(cell_value)
+
+        debut_date, last_match_date, match_ID_list, played_for_teams, played_against_teams = x[0], x[1], ast.literal_eval(x[2]), ast.literal_eval(x[3]), ast.literal_eval(x[4])
+        
+        venue_lst = data_manipulation.get_venues_for_matches(match_ID_list)
+        seasons = data_manipulation.get_season(match_ID_list)
+        
+        # Pass the additional variables to the template
+        return render_template('stats_filter.html', cell_value=cell_value, column_name=column_name, playing_teams=played_for_teams, opposition_teams=played_against_teams, venue_lst=venue_lst, debut_date=debut_date,last_match_date =last_match_date, seasons=seasons)
     
-    # You can render a template or return the processed data directly
+    return render_template('stats_filter.html', cell_value=cell_value, column_name=column_name)
 
-    # For example:
-    return render_template('stats_filter.html', cell_value=cell_value)
-
-@app.route('/process_stats_filter', methods=['POST'])
-def process_stats_filter():
-    # Retrieve form data
+@app.route('/process_stats_filter/<cell_value>/<column_name>', methods=['POST'])
+def process_stats_filter(cell_value, column_name):
+    
     playing_team = request.form.get('playing_team')
     opposition = request.form.get('opposition')
     venue = request.form.getlist('venue')
-    host_team = request.form.get('host_team')
     ground = request.form.get('ground')
     start_date = request.form.get('start_date')
     end_date = request.form.get('end_date')
@@ -71,14 +77,28 @@ def process_stats_filter():
     view_format = request.form.get('view_format')
     view_type = request.form.get('view_type')
 
-    # You can process the form data as needed (e.g., filter data from your database)
+    
 
-    # Render the detailed_filtered_stats_page and pass the selected values
-    return render_template('detailed_filtered_stats_page.html', 
+
+    print("Playing Team:", playing_team, type(playing_team))
+    print("Opposition:", opposition, type(opposition))
+    print("Venue:", venue, type(venue))
+    print("Ground:", ground, type(ground))
+    print("Start Date:", start_date, type(start_date))
+    print("End Date:", end_date, type(end_date))
+    print("Season:", season, type(season))
+    print("Match Result:", match_result, type(match_result))
+    print("View Format:", view_format, type(view_format))
+    print("View Type:", view_type, type(view_type))
+
+
+
+    return render_template('detailed_filtered_stats_page.html',
+                           cell_value = cell_value,
+                           column_name = column_name,
                            playing_team=playing_team, 
                            opposition=opposition, 
                            venue=venue, 
-                           host_team=host_team, 
                            ground=ground, 
                            start_date=start_date, 
                            end_date=end_date, 
