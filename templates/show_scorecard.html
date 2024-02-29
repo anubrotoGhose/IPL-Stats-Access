@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>IPL Access</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <h1>IPL Stats Explorer</h1>
+    <h1>Innings 1</h1>
+    <div class="content">
+      <h2>Match Details</h2>
+      <h2>{{ match_det|safe }}</h2>
+      <div id="bowling-stats">
+        <table>
+            {{ batting_1|safe }}
+        </table>
+      </div>
+      <div id="bowling-stats">
+        <table>
+          {{ bowling_1|safe }}
+        </table>
+      </div>
+      <div id="bowling-stats">
+          {{ rp_1 }}
+      </div>
+      <h1>Innings 2</h1>
+      <div id="bowling-stats">
+        <table>
+          {{ batting_2|safe }}
+        </table>
+      </div>
+
+      <div id="bowling-stats">
+        <table>
+          {{ bowling_2|safe }}
+        </table>
+      </div>
+        {{ rp_2 }}
+      </div>
+  </div>
+</body>
+</html>

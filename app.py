@@ -21,11 +21,26 @@ def home():
         return redirect(url_for('searchresults', user_input=user_input))
     return render_template('home.html')
 
-@app.route('/scorecard', methods=['GET', 'POST'])
-def scorecard_table():
+@app.route('/matchlists', methods=['GET', 'POST'])
+def match_list_table():
     df_match_list = scorecard.match_list()
-    table_html_ipl_match_list = df_match_list.to_html(classes='table')
-    return render_template('scorecard_table.html', table_html_ipl_match_list=table_html_ipl_match_list)
+    df_match_list['ID'] = df_match_list['ID'].apply(lambda x: f'<a href="/scorecard/{x}">{x}</a>')
+    table_html_ipl_match_list = df_match_list.to_html(classes='table', escape=False)
+    
+    return render_template('show_ipl_match_list.html', table_html_ipl_match_list=table_html_ipl_match_list)
+
+@app.route('/scorecard/<int:id>', methods=['GET'])
+def show_scorecard(id):
+    # Your code to fetch the scorecard data based on the ID
+    batting_1, batting_2,rp_1, bowling_1, bowling_2, rp_2 = scorecard.scorecard(id)
+    batting_1 = batting_1.to_html(classes='table')
+    batting_2 = batting_2.to_html(classes='table')
+    bowling_1 = bowling_1.to_html(classes='table')
+    bowling_2 = bowling_2.to_html(classes='table')
+    rp_1="Batters remaining:"+str(rp_1)
+    rp_2="Batters remaining:"+str(rp_2)
+    match_det = scorecard.match_details(id)
+    return render_template('show_scorecard.html',match_det=match_det, batting_1=batting_1, bowling_1 = bowling_1,rp_1=rp_1, batting_2=batting_2, bowling_2=bowling_2, rp_2=rp_2)
 
 @app.route('/searchresults/<user_input>')
 def searchresults(user_input):
