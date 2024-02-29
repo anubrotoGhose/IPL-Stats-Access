@@ -2,6 +2,8 @@ from flask import Flask, render_template, request, redirect, url_for, session
 import pandas as pd
 import search_results
 import data_manipulation
+import detailed_stats
+import scorecard
 import ast
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
@@ -18,6 +20,12 @@ def home():
 
         return redirect(url_for('searchresults', user_input=user_input))
     return render_template('home.html')
+
+@app.route('/scorecard', methods=['GET', 'POST'])
+def scorecard_table():
+    df_match_list = scorecard.match_list()
+    table_html_ipl_match_list = df_match_list.to_html(classes='table')
+    return render_template('scorecard_table.html', table_html_ipl_match_list=table_html_ipl_match_list)
 
 @app.route('/searchresults/<user_input>')
 def searchresults(user_input):
@@ -68,7 +76,6 @@ def process_stats_filter(cell_value, column_name):
     
     playing_team = request.form.get('playing_team')
     opposition = request.form.get('opposition')
-    venue = request.form.getlist('venue')
     ground = request.form.get('ground')
     start_date = request.form.get('start_date')
     end_date = request.form.get('end_date')
@@ -76,20 +83,71 @@ def process_stats_filter(cell_value, column_name):
     match_result = request.form.getlist('match_result')
     view_format = request.form.get('view_format')
     view_type = request.form.get('view_type')
+    id_list, date_list, team1_list, team2_list, v = detailed_stats.get_match_ids_and_teams_for_player(cell_value, start_date, end_date)
+    print(id_list, date_list, team1_list, team2_list, v)
+    playing_team_tuple = tuple(team1_list)
+    opposition_tuple = tuple(playing_team)
+    ground_tuple = tuple(ground)
+    season_tuple = tuple(season)
+    if playing_team == "all":
+        playing_team_tuple = tuple(team1_list)
+    else:
+        playing_team_tuple = tuple(playing_team)
+
+    if opposition == "all":
+        opposition_tuple = tuple(team2_list)
+    else:
+        opposition_tuple = tuple(playing_team)
+
+
+    if ground == "all":
+        ground_tuple = tuple(v)
+    else:
+        ground_tuple = tuple(ground)
+    
+    if season == "all":
+        pass
+    else:
+        season_tuple = tuple(season)
+
+    if len(match_result)==0 or len(match_result)==3:
+        pass
+    else:
+        match_result_tuple = tuple(match_result)
+    
+    if view_format == None:
+        print("hi")
+    else:
+        if view_format == "batting_formats":
+            view_format = "batter"
+        elif view_format == "bowling_formats":
+            view_format =="bowler"
+        elif view_format == "fielding_formats":
+            view_format =="bowler"
 
     
+    if view_type == "career_summary":
+        pass
+    elif view_type == "innings_by_innings_list":
+        pass
+    elif view_type == "innings_by_innings_list":
+        pass
+    elif view_type == "innings_by_innings_list":
+        pass
+    elif view_type == "innings_by_innings_list":
+        pass
+    elif view_type == "innings_by_innings_list":
+        pass
 
-
-    print("Playing Team:", playing_team, type(playing_team))
-    print("Opposition:", opposition, type(opposition))
-    print("Venue:", venue, type(venue))
-    print("Ground:", ground, type(ground))
-    print("Start Date:", start_date, type(start_date))
-    print("End Date:", end_date, type(end_date))
-    print("Season:", season, type(season))
-    print("Match Result:", match_result, type(match_result))
-    print("View Format:", view_format, type(view_format))
-    print("View Type:", view_type, type(view_type))
+    # print("Playing Team:", playing_team, type(playing_team), len(playing_team))
+    # print("Opposition:", opposition, type(opposition), len(opposition))
+    # print("Ground:", ground, type(ground), len(ground))
+    print("Start Date:", start_date, type(start_date), len(start_date))
+    print("End Date:", end_date, type(end_date), len(end_date))
+    # print("Season:", season, type(season), len(season))
+    # print("Match Result:", match_result, type(match_result), len(match_result))
+    # print("View Format:", view_format, type(view_format))
+    # print("View Type:", view_type, type(view_type), len(view_type))
 
 
 
@@ -98,7 +156,6 @@ def process_stats_filter(cell_value, column_name):
                            column_name = column_name,
                            playing_team=playing_team, 
                            opposition=opposition, 
-                           venue=venue, 
                            ground=ground, 
                            start_date=start_date, 
                            end_date=end_date, 
