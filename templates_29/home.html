@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>IPL Access</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <h1>IPL Data HQ</h1>
+    <h1>Enter the name of a player, team, ground or umpire/referee:</h1>
+    <form method="POST">
+        <input type="text" name="user_input" />
+        <input type="submit" value="Search" />
+    </form>
+    <p><a href="/matchlists">View IPL Match Lists</a></p>
+    <center>
+    <table>
+        <tr>
+          <th>Batting Records/Stats</th>
+          <th>Bowling Records/Stats</th>
+          <th>Teams Records/Stats</th>
+          <th>Venue Records/Stats</th>
+        </tr>
+        <tr>
+          <td>Top Batters by Average</td>
+          <td>Top Bowlers by Average</td>
+          <td>Top Teams by Average Differential</td>
+          <td>Top Venues by Average</td>
+        </tr>
+        <tr>
+          <td>Top Batters by Average</td>
+          <td>Top Batters by Average</td>
+          <td>Top Batters by Average</td>
+          <td>Top Batters by Average</td>
+        </tr>
+      </table>
+    </center>
+</body>
+</html>

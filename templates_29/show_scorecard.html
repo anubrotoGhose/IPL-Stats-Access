@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>IPL Access</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <h1>IPL Data HQ</h1>
+    <h1>Scorecard</h1>
+    <div class="content">
+      <h2>Scorecard</h2>
+      <div id="bowling-stats">
+        <table>
+            {{ scorecard_data|safe }}
+        </table>
+      </div>
+      
+  </div>
+</body>
+</html>

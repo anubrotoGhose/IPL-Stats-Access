@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Stats Filter Page</title>
+    <!-- <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}"> -->
+</head>
+<body>
+    <div class="content">
+        <h1>Stats Filter Page</h1>
+        <p>Cell Value: {{ cell_value }}</p>
+
+        <a href="{{ url_for('profile_page', column_name=column_name, value=cell_value) }}" class="btn btn-primary">Back to Profile Page</a>
+
+        <form action="{{ url_for('process_stats_filter', cell_value=cell_value, column_name=column_name) }}" method="POST">
+            
+            <!-- Playing Team -->
+            <div class="form-group">
+                <label for="playing_team">Playing Team:</label>
+                <select id="playing_team" name="playing_team">
+                    <option value="all" selected>All</option>
+                    {% for team in playing_teams %}
+                        <option value="{{ team }}">{{ team }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        
+            <!-- Opposition -->
+            <div class="form-group">
+                <label for="opposition">Opposition:</label>
+                <select id="opposition" name="opposition">
+                    <option value="all" selected>All</option>
+                    {% for team in opposition_teams %}
+                        <option value="{{ team }}">{{ team }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        
+            <!-- Ground -->
+            <div class="form-group">
+                <label for="ground">Ground:</label>
+                <select id="ground" name="ground">
+                    <option value="all" selected>All</option>
+                    {% for venue in venue_lst %}
+                        <option value="{{ venue }}">{{ venue }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        
+            <!-- Starting date -->
+            <div class="form-group">
+                <label for="start_date">Starting date:</label>
+                <input type="date" id="start_date" name="start_date" value="{{ debut_date }}">
+            </div>
+        
+            <!-- End date -->
+            <div class="form-group">
+                <label for="end_date">End date:</label>
+                <input type="date" id="end_date" name="end_date" value="{{ last_match_date }}">
+            </div>
+        
+            <!-- Season -->
+            <div class="form-group">
+                <label for="season">Season:</label>
+                <select id="season" name="season">
+                    <option value="all" selected>All</option>
+                    {% for season in seasons %}
+                        <option value="{{ season }}">{{ season }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        
+            <!-- Match result -->
+            <div class="form-group">
+                <label>Match Result:</label>
+                <div>
+                    <input type="checkbox" id="won_match" name="match_result" value="won_match">
+                    <label for="won_match">Won Match</label>
+                </div>
+                <div>
+                    <input type="checkbox" id="lost_match" name="match_result" value="lost_match">
+                    <label for="lost_match">Lost Match</label>
+                </div>
+                <div>
+                    <input type="checkbox" id="drawn_match" name="match_result" value="drawn_match">
+                    <label for="drawn_match">Drawn Match</label>
+                </div>
+            </div>
+        
+            <!-- View format -->
+            <div class="form-group">
+                <label>View Format:</label>
+                <div>
+                    <input type="radio" id="all_round" name="view_format" value="all_round">
+                    <label for="all_round">All-round/General</label>
+                </div>
+                <div>
+                    <input type="radio" id="batting_formats" name="view_format" value="batting_formats">
+                    <label for="batting_formats">Batting Formats</label>
+                </div>
+                <div>
+                    <input type="radio" id="bowling_formats" name="view_format" value="bowling_formats">
+                    <label for="bowling_formats">Bowling Formats</label>
+                </div>
+                <div>
+                    <input type="radio" id="fielding_formats" name="view_format" value="fielding_formats">
+                    <label for="fielding_formats">Fielding Formats</label>
+                </div>
+            </div>
+        
+            <!-- View Type -->
+            <div class="form-group">
+                <label>View Type:</label>
+                <select id="view_type" name="view_type">
+                    <option value="career_summary">Career Summary</option>
+                    <option value="innings_by_innings_list">Innings by Innings List</option>
+                    <option value="match_by_match_list">Match by Match List</option>
+                    <option value="cumulative_averages">Cumulative Averages</option>
+                    <option value="reverse_cumulative">Reverse Cumulative</option>
+                    <option value="series_averages">Series Averages</option>
+                    <option value="ground_averages">Ground Averages</option>
+                </select>
+            </div>
+        
+            <!-- Submit button -->
+            <div class="form-group">
+                <input type="submit" value="Filter Stats">
+            </div>
+        </form>
+    </div>
+</body>
+</html>

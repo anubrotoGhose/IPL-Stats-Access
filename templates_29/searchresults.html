@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>IPL Data Results</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}"> 
+</head>
+<body>
+    <div class="results-container">
+        <h1 class="title">Search Results</h1>
+
+        <div class="button-container">
+            {% for key in dict_keys %}
+                <button class="column-button" onclick="showColumn('{{ key }}')"> {{ key }} </button>
+            {% endfor %}
+        </div>
+
+        <div id="columnData" class="data-container"></div>
+    </div>
+
+    <script>
+        var searchData = {{ search_dict|tojson }};
+    </script>
+
+    <!-- External JavaScript file -->
+    <script src="{{ url_for('static', filename='result_search.js') }}"></script>
+</body>
+</html>
