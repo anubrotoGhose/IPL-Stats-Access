@@ -37,6 +37,7 @@ def show_scorecard(id):
     batting_2 = batting_2.to_html(classes='table')
     bowling_1 = bowling_1.to_html(classes='table')
     bowling_2 = bowling_2.to_html(classes='table')
+  
     rp_1="Batters remaining:"+str(rp_1)
     rp_2="Batters remaining:"+str(rp_2)
     match_det = scorecard.match_details(id)
@@ -99,11 +100,14 @@ def process_stats_filter(cell_value, column_name):
     view_format = request.form.get('view_format')
     view_type = request.form.get('view_type')
     id_list, date_list, team1_list, team2_list, v = detailed_stats.get_match_ids_and_teams_for_player(cell_value, start_date, end_date)
-    print(id_list, date_list, team1_list, team2_list, v)
+    # print(id_list, date_list, team1_list, team2_list, v)
     playing_team_tuple = tuple(team1_list)
     opposition_tuple = tuple(playing_team)
     ground_tuple = tuple(ground)
     season_tuple = tuple(season)
+
+    df_bat_innings = None
+    df_bowl_innings = None
     if playing_team == "all":
         playing_team_tuple = tuple(team1_list)
     else:
@@ -129,36 +133,50 @@ def process_stats_filter(cell_value, column_name):
         pass
     else:
         match_result_tuple = tuple(match_result)
-    
     if view_format == None:
-        print("hi")
+        view_format = "all"
     else:
         if view_format == "batting_formats":
             view_format = "batter"
         elif view_format == "bowling_formats":
-            view_format =="bowler"
+            view_format = "bowler"
         elif view_format == "fielding_formats":
-            view_format =="bowler"
-
+            view_format = "bowler"
+        elif view_format == "all_round":
+            view_format = "all"
+            
     
     if view_type == "career_summary":
         pass
     elif view_type == "innings_by_innings_list":
+        if view_format == "all" or view_format == 'batter':
+            df_bat_innings = detailed_stats.innings_by_innings_list_batting(cell_value, id_list)
+            df_bat_innings = df_bat_innings.dropna(subset=['batter'])
+            df_bat_innings.index = range(1, len(df_bat_innings) + 1)
+            df_bat_innings["ID"] = df_bat_innings['ID'].apply(lambda x: f'<a href="/scorecard/{x}">{x}</a>')
+            df_bat_innings = df_bat_innings.to_html(classes='table', escape=False)
+        if view_format == "all" or view_format == 'bowler':
+            df_bowl_innings = detailed_stats.innings_by_innings_list_bowling(cell_value, id_list)
+            df_bowl_innings = df_bowl_innings.dropna(subset=['Bowler'])
+            df_bowl_innings.index = range(1, len(df_bowl_innings) + 1)
+            df_bowl_innings["ID"] = df_bowl_innings['ID'].apply(lambda x: f'<a href="/scorecard/{x}">{x}</a>')
+            df_bowl_innings = df_bowl_innings.to_html(classes='table', escape=False)
+    elif view_type == "match_by_match_list":
         pass
-    elif view_type == "innings_by_innings_list":
+    elif view_type == "cumulative_averages":
         pass
-    elif view_type == "innings_by_innings_list":
+    elif view_type == "reverse_cumulative":
         pass
-    elif view_type == "innings_by_innings_list":
+    elif view_type == "series_averages":
         pass
-    elif view_type == "innings_by_innings_list":
+    elif view_type == "ground_averages":
         pass
 
     # print("Playing Team:", playing_team, type(playing_team), len(playing_team))
     # print("Opposition:", opposition, type(opposition), len(opposition))
     # print("Ground:", ground, type(ground), len(ground))
-    print("Start Date:", start_date, type(start_date), len(start_date))
-    print("End Date:", end_date, type(end_date), len(end_date))
+    # print("Start Date:", start_date, type(start_date), len(start_date))
+    # print("End Date:", end_date, type(end_date), len(end_date))
     # print("Season:", season, type(season), len(season))
     # print("Match Result:", match_result, type(match_result), len(match_result))
     # print("View Format:", view_format, type(view_format))
@@ -177,7 +195,9 @@ def process_stats_filter(cell_value, column_name):
                            season=season, 
                            match_result=match_result, 
                            view_format=view_format, 
-                           view_type=view_type)
+                           view_type=view_type,
+                           df_bat_innings = df_bat_innings,
+                           df_bowl_innings = df_bowl_innings)
 
 
 if __name__ == '__main__':

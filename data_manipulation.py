@@ -2,8 +2,6 @@ import sqlite3
 import numpy as np
 import pandas as pd
 
-import sqlite3
-
 
 def get_season(match_ID_list):
     conn = sqlite3.connect('ipl_database.db')
@@ -333,7 +331,7 @@ def bowls_played(player_name, start_date, end_date):
     SELECT COUNT(*) AS TotalBatterAppearances
     FROM ipl_ball_by_ball AS b
     JOIN ipl_match_list AS m ON b.ID = m.ID
-    WHERE b.batter = ? AND m.Date BETWEEN ? AND ? AND (b.extra_type IS NULL OR b.extra_type = 'noballs')
+    WHERE b.batter = ? AND m.Date BETWEEN ? AND ? AND (b.extra_type IS NULL OR b.extra_type = 'byes' OR b.extra_type = 'legbyes' OR b.extra_type = 'noballs' )
     '''
 
     cursor.execute(query, (player_name, start_date, end_date))
@@ -352,7 +350,7 @@ def total_bowls(player_name, start_date, end_date):
     SELECT COUNT(*) AS TotalBowlsPlayed
     FROM ipl_ball_by_ball AS b
     JOIN ipl_match_list AS m ON b.ID = m.ID
-    WHERE b.bowler = ? AND m.Date BETWEEN ? AND ? AND b.extra_type IS NULL
+    WHERE b.bowler = ? AND m.Date BETWEEN ? AND ? AND (b.extra_type IS NULL OR b.extra_type LIKE "%byes%")
     '''
 
     cursor.execute(query, (player_name, start_date, end_date))
@@ -423,7 +421,7 @@ def bowler_runs(player_name, start_date, end_date):
     SELECT SUM(total_run) AS TotalRunsGiven
     FROM ipl_ball_by_ball AS b
     JOIN ipl_match_list AS m ON b.ID = m.ID
-    WHERE b.bowler = ? AND m.Date BETWEEN ? AND ?
+    WHERE b.bowler = ? AND m.Date BETWEEN ? AND ? AND (b.extra_type IS NULL OR b.extra_type = 'noballs' OR b.extra_type = 'wides')
     '''
 
     cursor.execute(query, (player_name, start_date, end_date))
@@ -463,11 +461,13 @@ def bowler_stats(player_name, start_date, end_date):
     
     bowling_avg = np.nan if count == 0 else round(player_runs / count, 2)
     bowling_strike_rate = np.nan if count == 0 else round(total_bowls(player_name, start_date, end_date) / count, 2)
+    bowling_eco = np.nan if total_bowls(player_name, start_date, end_date) == 0 else round((player_runs*6) / total_bowls(player_name, start_date, end_date), 2)
     bowler_dict = {}
     bowler_dict['Matches'] = [num_matches(player_name, start_date, end_date)]
     bowler_dict['Innings'] = [bowler_innings(player_name, start_date, end_date)]
     bowler_dict['Runs'] = [player_runs]
     bowler_dict['Wickets'] = [count]
+    bowler_dict['Economy'] = [bowling_eco]
     bowler_dict['Balls'] = [total_bowls(player_name, start_date, end_date)]
     bowler_dict['Strike Rate'] = [bowling_strike_rate]
     bowler_dict['Average'] = [bowling_avg]

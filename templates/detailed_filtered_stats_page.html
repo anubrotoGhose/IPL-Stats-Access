@@ -8,8 +8,8 @@
 <body>
     <div class="content">
         <h1>Detailed Filtered Stats Page</h1>
-        <p>Cell Value: {{ cell_value }}</p>
-        <p>Column Name: {{ column_name }}</p>
+        <p>Stats of {{ cell_value }}</p>
+        <p>Category: {{ column_name }}</p>
         <p>Playing Team: {{ playing_team }}</p>
         <p>Opposition: {{ opposition }}</p>
         <p>Venue: {{ ', '.join(venue) }}</p>
@@ -20,6 +20,20 @@
         <p>Match Result: {{ ', '.join(match_result) }}</p>
         <p>View Format: {{ view_format }}</p>
         <p>View Type: {{ view_type }}</p>
+    </div>
+    <h2>Batting Stats</h2>
+    <div class="content">
+        <table>
+            {{ df_bat_innings|safe }}
+        </table>
+        
+    </div>
+    <h2>Bowling Stats</h2>
+    <div class="content">
+        <table>
+            {{ df_bowl_innings|safe }}
+        </table>
+        
     </div>
 </body>
 </html>

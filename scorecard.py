@@ -25,7 +25,8 @@ def fetch_batting_scorecard(ID, innings, batters_list):
 
     # Fetch batting data
     batting_query = f'''
-    SELECT batter, SUM(batsman_run) AS Runs_Scored, COUNT(*) AS Balls_Faced, 
+    SELECT batter, SUM(batsman_run) AS Runs_Scored, 
+    COUNT(CASE WHEN extra_type IS NULL OR extra_type = 'byes' OR extra_type = 'legbyes' OR extra_type = 'noballs' THEN 1 ELSE NULL END) AS Balls_Faced, 
            SUM(CASE WHEN batsman_run = 4 THEN 1 ELSE 0 END) AS Four_Count,
            SUM(CASE WHEN batsman_run = 6 THEN 1 ELSE 0 END) AS Six_Count,
            SUM(CASE WHEN player_out != 'not out' THEN 1 ELSE 0 END) AS Out, 
