@@ -48,20 +48,35 @@ def fetch_batting_scorecard(ID, innings, batters_list):
 
 def fetch_bowling_scorecard(ID, innings):
     conn = sqlite3.connect('./ipl_database.db')
-
+    # SUM(CASE WHEN non_boundary = 0 THEN 1 ELSE 0 END) AS Dots,
     # Fetch bowling data
     bowling_query = f'''
-    SELECT bowler, overs, SUM(batsman_run) AS Runs_Conceding, 
-           COUNT(CASE WHEN isWicketDelivery = 1 THEN 1 ELSE NULL END) AS Wickets,
-           SUM(CASE WHEN non_boundary = 0 THEN 1 ELSE 0 END) AS Dots,
-           SUM(CASE WHEN batsman_run = 4 THEN 1 ELSE 0 END) AS Four_Count,
-           SUM(CASE WHEN batsman_run = 6 THEN 1 ELSE 0 END) AS Six_Count,
-           SUM(CASE WHEN extra_type = 'wide' THEN 1 ELSE 0 END) AS Wide,
-           SUM(CASE WHEN extra_type = 'noballs' THEN 1 ELSE 0 END) AS noballs_bowled
+    SELECT 
+        bowler,
+        (COUNT(CASE WHEN extra_type IS NULL OR extra_type LIKE '%byes%' THEN 1 ELSE 0 END) - 
+        SUM(CASE WHEN extra_type = 'wides' THEN 1 ELSE 0 END) - 
+        SUM(CASE WHEN extra_type = 'noballs' THEN 1 ELSE 0 END)) AS Balls,
+        CAST((COUNT(CASE WHEN extra_type IS NULL OR extra_type LIKE '%byes%' THEN 1 ELSE 0 END) - 
+        SUM(CASE WHEN extra_type = 'wides' THEN 1 ELSE 0 END) - 
+        SUM(CASE WHEN extra_type = 'noballs' THEN 1 ELSE 0 END)) / 6 AS TEXT) || '.' ||
+        ((COUNT(CASE WHEN extra_type IS NULL OR extra_type LIKE '%byes%' THEN 1 ELSE 0 END) - 
+        SUM(CASE WHEN extra_type = 'wides' THEN 1 ELSE 0 END) - 
+        SUM(CASE WHEN extra_type = 'noballs' THEN 1 ELSE 0 END)) % 6) AS Overs,
+        SUM(batsman_run) AS Runs_Conceding, 
+        SUM(CASE WHEN isWicketDelivery = 1 THEN 1 ELSE 0 END) AS Wickets,
+        ROUND((CAST(SUM(batsman_run) AS FLOAT) / 
+        (COUNT(CASE WHEN extra_type IS NULL OR extra_type LIKE '%byes%' THEN 1 ELSE 0 END) - 
+        SUM(CASE WHEN extra_type = 'wides' THEN 1 ELSE 0 END) - 
+        SUM(CASE WHEN extra_type = 'noballs' THEN 1 ELSE 0 END))) * 6, 2) AS Economy,
+        SUM(CASE WHEN batsman_run = 4 THEN 1 ELSE 0 END) AS Four_Count,
+        SUM(CASE WHEN batsman_run = 6 THEN 1 ELSE 0 END) AS Six_Count,
+        SUM(CASE WHEN extra_type = 'wides' THEN 1 ELSE 0 END) AS Wides,
+        SUM(CASE WHEN extra_type = 'noballs' THEN 1 ELSE 0 END) AS Noballs_Bowled
     FROM ipl_ball_by_ball
     WHERE ID = ? AND innings = ?
-    GROUP BY bowler, overs;
+    GROUP BY bowler;
     '''
+
     bowling_data = pd.read_sql_query(bowling_query, conn, params=(ID, innings))
 
     conn.close()
@@ -100,4 +115,3 @@ def match_list():
     conn.close()
 
     return df_match_list
-    
