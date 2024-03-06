@@ -100,7 +100,7 @@ def process_stats_filter(cell_value, column_name):
     view_format = request.form.get('view_format')
     view_type = request.form.get('view_type')
     id_list, date_list, team1_list, team2_list, v = detailed_stats.get_match_ids_and_teams_for_player(cell_value, start_date, end_date)
-    # print(id_list, date_list, team1_list, team2_list, v)
+    # print(id_list,"\n" , date_list,"\n", team1_list,"\n", team2_list,"\n", v)
     playing_team_tuple = tuple(team1_list)
     opposition_tuple = tuple(playing_team)
     ground_tuple = tuple(ground)
@@ -109,26 +109,17 @@ def process_stats_filter(cell_value, column_name):
     df_bat_innings = None
     df_bowl_innings = None
     df_field_innings = None
-    if playing_team == "all":
-        playing_team_tuple = tuple(team1_list)
-    else:
-        playing_team_tuple = tuple(playing_team)
+    if playing_team != "all":
+        team1_list = [playing_team]
 
-    if opposition == "all":
-        opposition_tuple = tuple(team2_list)
-    else:
-        opposition_tuple = tuple(playing_team)
-
-
-    if ground == "all":
-        ground_tuple = tuple(v)
-    else:
-        ground_tuple = tuple(ground)
+    if opposition != "all":
+        team1_list = [opposition]
     
-    if season == "all":
-        pass
-    else:
-        season_tuple = tuple(season)
+    if ground != "all":
+        v = [ground]
+    
+    if season != "all":
+        seasons =  [season]
 
     if len(match_result)==0 or len(match_result)==3:
         pass

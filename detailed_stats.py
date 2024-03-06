@@ -270,14 +270,21 @@ def innings_by_innings_list_fieldings(player_name, id_list):
 
 
 def home_match_ID_list(name, id_list, team1_list, team2_list):
-    
+    team1_list = team1_list.split(",")
+    team2_list = team2_list.split(",")
+    for ID in id_list:
+        conn = sqlite3.connect('./ipl_database.db')
+        cursor = conn.cursor()
+        query = """
+        
+        """
     pass
 
 def career_summary_batting_venue(name, id_list):
     conn = sqlite3.connect('./ipl_database.db')
     cursor = conn.cursor()
     query = """
-    SELECT ID
+    SELECT ipl_match_list.ID
     FROM
     ipl_match_list
     WHERE  

@@ -401,6 +401,7 @@ def batter_stats(player_name, start_date, end_date):
     batting_avg = np.nan if count == 0 else round(player_runs / count, 2)
     batting_strike_rate = np.nan if bowls_played(player_name, start_date, end_date) == 0 else round((player_runs*100) / bowls_played(player_name, start_date, end_date), 2)
     batter_dict = {}
+    batter_dict["Name"] = [player_name]
     batter_dict['Matches'] = [num_matches(player_name, start_date, end_date)]
     batter_dict['Innings'] = [batter_innings(player_name, start_date, end_date)]
     batter_dict['Runs'] = [player_runs]
@@ -463,6 +464,7 @@ def bowler_stats(player_name, start_date, end_date):
     bowling_strike_rate = np.nan if count == 0 else round(total_bowls(player_name, start_date, end_date) / count, 2)
     bowling_eco = np.nan if total_bowls(player_name, start_date, end_date) == 0 else round((player_runs*6) / total_bowls(player_name, start_date, end_date), 2)
     bowler_dict = {}
+    bowler_dict["Name"] = [player_name]
     bowler_dict['Matches'] = [num_matches(player_name, start_date, end_date)]
     bowler_dict['Innings'] = [bowler_innings(player_name, start_date, end_date)]
     bowler_dict['Runs'] = [player_runs]
