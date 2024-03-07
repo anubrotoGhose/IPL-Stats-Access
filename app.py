@@ -87,6 +87,43 @@ def stats_filter(cell_value, column_name):
     
     return render_template('stats_filter.html', cell_value=cell_value, column_name=column_name)
 
+
+@app.route('/top_partnerships')
+def top_partnerships():
+    return render_template('top_10_partnerships.html')
+
+@app.route('/season_partnerships')
+def season_partnerships():
+    return render_template('season_partnerships.html')
+
+@app.route('/top_batsmen')
+def top_batsmen():
+    return render_template('top_10_batsmen.html')
+
+@app.route('/top_batsman_score')
+def top_batsman_score():
+    return render_template('top_batsman_score.html')
+
+@app.route('/select_batsmen_across_seasons')
+def select_batsmen_across_seasons():
+    return render_template('select_batsmen_across_seasons.html')
+
+@app.route('/player_of_the_match')
+def player_of_match():
+    return render_template('player_of_the_match.html')
+
+@app.route('/hatricks')
+def hatricks():
+    return render_template('hatricks.html')
+
+@app.route('/highest_four_hitters')
+def highest_four_hitters():
+    return render_template('highest_four_hitters.html')
+
+@app.route('/highest_sixers')
+def highest_sixers():
+    return render_template('highest_sixers.html')
+
 @app.route('/process_stats_filter/<cell_value>/<column_name>', methods=['POST'])
 def process_stats_filter(cell_value, column_name):
     
