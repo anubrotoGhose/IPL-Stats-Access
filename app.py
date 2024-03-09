@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, session
 import pandas as pd
 import search_results
 import data_manipulation
+import venue_stats
 import detailed_stats
 import scorecard
 import ast
@@ -41,6 +42,8 @@ def show_scorecard(id):
     rp_1="Batters remaining:"+str(rp_1)
     rp_2="Batters remaining:"+str(rp_2)
     match_det = scorecard.match_details(id)
+    x = scorecard.match_function(match_det)
+    print(x)
     return render_template('show_scorecard.html',match_det=match_det, batting_1=batting_1, bowling_1 = bowling_1,rp_1=rp_1, batting_2=batting_2, bowling_2=bowling_2, rp_2=rp_2)
 
 @app.route('/searchresults/<user_input>')
@@ -61,15 +64,23 @@ def profile_page(column_name):
     if column_name == 'Players':
         first_match_date, last_match_date = data_manipulation.get_first_and_last_match_dates(cell_value)
         df_batter = pd.DataFrame(data_manipulation.batter_stats(cell_value, first_match_date, last_match_date)) # Add Start and End Date
-        df_bowler = pd.DataFrame(data_manipulation.bowler_stats(cell_value, first_match_date, last_match_date)) # Add Start and End Date
+        df_bowler = pd.DataFrame(data_manipulation.bowler_stats(cell_value, first_match_date, last_match_date))
+        df_fielder = data_manipulation.fielder_stats(cell_value, first_match_date, last_match_date)
+
+    elif column_name == 'Venues':
+        first_match_date, last_match_date = venue_stats.get_first_and_last_match_dates(cell_value)
     else:
         df_batter = pd.DataFrame(data_manipulation.x_batter_stats(cell_value)) # Add Start and End Date
         df_bowler = pd.DataFrame(data_manipulation.x_bowler_stats(cell_value)) # Add Start and End Date
-
-    # Convert the DataFrame to HTML
     table_html_batter = df_batter.to_html(classes='table')
     table_html_bowler = df_bowler.to_html(classes='table')
-    return render_template('profile_page.html', column_name=column_name, cell_value=cell_value, table_html_batter=table_html_batter, table_html_bowler = table_html_bowler)
+    table_html_fielder = df_fielder.to_html(classes='table')
+    return render_template('profile_page.html', 
+                           column_name=column_name, 
+                           cell_value=cell_value, 
+                           table_html_batter=table_html_batter, 
+                           table_html_bowler = table_html_bowler, 
+                           table_html_fielder = table_html_fielder)
 
 @app.route('/stats_filter/<cell_value>/<column_name>')
 def stats_filter(cell_value, column_name):
@@ -84,6 +95,7 @@ def stats_filter(cell_value, column_name):
         
         # Pass the additional variables to the template
         return render_template('stats_filter.html', cell_value=cell_value, column_name=column_name, playing_teams=played_for_teams, opposition_teams=played_against_teams, venue_lst=venue_lst, debut_date=debut_date,last_match_date =last_match_date, seasons=seasons)
+    
     
     return render_template('stats_filter.html', cell_value=cell_value, column_name=column_name)
 
@@ -143,9 +155,9 @@ def process_stats_filter(cell_value, column_name):
     ground_tuple = tuple(ground)
     season_tuple = tuple(season)
 
-    df_bat_innings = None
-    df_bowl_innings = None
-    df_field_innings = None
+    df_bat = None
+    df_bowl = None
+    df_field = None
     if playing_team != "all":
         team1_list = [playing_team]
 
@@ -177,137 +189,94 @@ def process_stats_filter(cell_value, column_name):
     
     if view_type == "career_summary":
         if view_format == "all" or view_format == 'batter':
-            df_bat_innings = detailed_stats.innings_by_innings_list_batting(cell_value, id_list)
-            df_bat_innings = df_bat_innings.dropna(subset=['batter'])
-            df_bat_innings.index = range(1, len(df_bat_innings) + 1)
-            df_bat_innings["ID"] = df_bat_innings['ID'].apply(lambda x: f'<a href="/scorecard/{x}">{x}</a>')
-            df_bat_innings = df_bat_innings.to_html(classes='table', escape=False)
+            df_bat = pd.DataFrame(data_manipulation.batter_stats(cell_value, start_date, end_date))
+            df_bat = df_bat.to_html(classes='table', escape=False)
         if view_format == "all" or view_format == 'bowler':
-            df_bowl_innings = detailed_stats.innings_by_innings_list_bowling(cell_value, id_list)
-            df_bowl_innings = df_bowl_innings.dropna(subset=['Bowler'])
-            df_bowl_innings.index = range(1, len(df_bowl_innings) + 1)
-            df_bowl_innings["ID"] = df_bowl_innings['ID'].apply(lambda x: f'<a href="/scorecard/{x}">{x}</a>')
-            df_bowl_innings = df_bowl_innings.to_html(classes='table', escape=False)
+            df_bowl = pd.DataFrame(data_manipulation.bowler_stats(cell_value, start_date, end_date))
+            df_bowl = df_bowl.to_html(classes='table', escape=False)
         if view_format == "all" or view_format == 'fielder':
-            df_field_innings = detailed_stats.innings_by_innings_list_fieldings(cell_value, id_list)
-            df_field_innings = df_field_innings.dropna(subset=['Fielder'])
-            df_field_innings.index = range(1, len(df_field_innings) + 1)
-            df_field_innings["ID"] = df_field_innings['ID'].apply(lambda x: f'<a href="/scorecard/{x}">{x}</a>')
-            df_field_innings = df_field_innings.to_html(classes='table', escape=False)
+            df_field = data_manipulation.fielder_stats(cell_value, start_date, end_date)
+            df_field = df_field.to_html(classes='table', escape=False)
     elif view_type == "innings_by_innings_list":
         if view_format == "all" or view_format == 'batter':
-            df_bat_innings = detailed_stats.innings_by_innings_list_batting(cell_value, id_list)
-            df_bat_innings = df_bat_innings.dropna(subset=['batter'])
-            df_bat_innings.index = range(1, len(df_bat_innings) + 1)
-            df_bat_innings["ID"] = df_bat_innings['ID'].apply(lambda x: f'<a href="/scorecard/{x}">{x}</a>')
-            df_bat_innings = df_bat_innings.to_html(classes='table', escape=False)
+            df_bat = detailed_stats.innings_by_innings_list_batting(cell_value, id_list)
+            df_bat = df_bat.dropna(subset=['batter'])
+            df_bat.index = range(1, len(df_bat) + 1)
+            df_bat["ID"] = df_bat['ID'].apply(lambda x: f'<a href="/scorecard/{x}">{x}</a>')
+            df_bat = df_bat.to_html(classes='table', escape=False)
         if view_format == "all" or view_format == 'bowler':
-            df_bowl_innings = detailed_stats.innings_by_innings_list_bowling(cell_value, id_list)
-            df_bowl_innings = df_bowl_innings.dropna(subset=['Bowler'])
-            df_bowl_innings.index = range(1, len(df_bowl_innings) + 1)
-            df_bowl_innings["ID"] = df_bowl_innings['ID'].apply(lambda x: f'<a href="/scorecard/{x}">{x}</a>')
-            df_bowl_innings = df_bowl_innings.to_html(classes='table', escape=False)
+            df_bowl = detailed_stats.innings_by_innings_list_bowling(cell_value, id_list)
+            df_bowl = df_bowl.dropna(subset=['Bowler'])
+            df_bowl.index = range(1, len(df_bowl) + 1)
+            df_bowl["ID"] = df_bowl['ID'].apply(lambda x: f'<a href="/scorecard/{x}">{x}</a>')
+            df_bowl = df_bowl.to_html(classes='table', escape=False)
         if view_format == "all" or view_format == 'fielder':
-            df_field_innings = detailed_stats.innings_by_innings_list_fieldings(cell_value, id_list)
-            df_field_innings = df_field_innings.dropna(subset=['Fielder'])
-            df_field_innings.index = range(1, len(df_field_innings) + 1)
-            df_field_innings["ID"] = df_field_innings['ID'].apply(lambda x: f'<a href="/scorecard/{x}">{x}</a>')
-            df_field_innings = df_field_innings.to_html(classes='table', escape=False)
-    elif view_type == "match_by_match_list":
-        if view_format == "all" or view_format == 'batter':
-            df_bat_innings = detailed_stats.innings_by_innings_list_batting(cell_value, id_list)
-            df_bat_innings = df_bat_innings.dropna(subset=['batter'])
-            df_bat_innings.index = range(1, len(df_bat_innings) + 1)
-            df_bat_innings["ID"] = df_bat_innings['ID'].apply(lambda x: f'<a href="/scorecard/{x}">{x}</a>')
-            df_bat_innings = df_bat_innings.to_html(classes='table', escape=False)
-        if view_format == "all" or view_format == 'bowler':
-            df_bowl_innings = detailed_stats.innings_by_innings_list_bowling(cell_value, id_list)
-            df_bowl_innings = df_bowl_innings.dropna(subset=['Bowler'])
-            df_bowl_innings.index = range(1, len(df_bowl_innings) + 1)
-            df_bowl_innings["ID"] = df_bowl_innings['ID'].apply(lambda x: f'<a href="/scorecard/{x}">{x}</a>')
-            df_bowl_innings = df_bowl_innings.to_html(classes='table', escape=False)
-        if view_format == "all" or view_format == 'fielder':
-            df_field_innings = detailed_stats.innings_by_innings_list_fieldings(cell_value, id_list)
-            df_field_innings = df_field_innings.dropna(subset=['Fielder'])
-            df_field_innings.index = range(1, len(df_field_innings) + 1)
-            df_field_innings["ID"] = df_field_innings['ID'].apply(lambda x: f'<a href="/scorecard/{x}">{x}</a>')
-            df_field_innings = df_field_innings.to_html(classes='table', escape=False)
+            df_field = detailed_stats.innings_by_innings_list_fieldings(cell_value, id_list)
+            df_field = df_field.dropna(subset=['Fielder'])
+            df_field.index = range(1, len(df_field) + 1)
+            df_field["ID"] = df_field['ID'].apply(lambda x: f'<a href="/scorecard/{x}">{x}</a>')
+            df_field = df_field.to_html(classes='table', escape=False)
     elif view_type == "cumulative_averages":
         if view_format == "all" or view_format == 'batter':
-            df_bat_innings = detailed_stats.innings_by_innings_list_batting(cell_value, id_list)
-            df_bat_innings = df_bat_innings.dropna(subset=['batter'])
-            df_bat_innings.index = range(1, len(df_bat_innings) + 1)
-            df_bat_innings["ID"] = df_bat_innings['ID'].apply(lambda x: f'<a href="/scorecard/{x}">{x}</a>')
-            df_bat_innings = df_bat_innings.to_html(classes='table', escape=False)
+            df_bat = detailed_stats.innings_by_innings_list_batting(cell_value, id_list)
+            df_bat = df_bat.dropna(subset=['batter'])
+            df_bat.index = range(1, len(df_bat) + 1)
+            df_bat["ID"] = df_bat['ID'].apply(lambda x: f'<a href="/scorecard/{x}">{x}</a>')
+            df_bat = df_bat.to_html(classes='table', escape=False)
         if view_format == "all" or view_format == 'bowler':
-            df_bowl_innings = detailed_stats.innings_by_innings_list_bowling(cell_value, id_list)
-            df_bowl_innings = df_bowl_innings.dropna(subset=['Bowler'])
-            df_bowl_innings.index = range(1, len(df_bowl_innings) + 1)
-            df_bowl_innings["ID"] = df_bowl_innings['ID'].apply(lambda x: f'<a href="/scorecard/{x}">{x}</a>')
-            df_bowl_innings = df_bowl_innings.to_html(classes='table', escape=False)
+            df_bowl = detailed_stats.innings_by_innings_list_bowling(cell_value, id_list)
+            df_bowl = df_bowl.dropna(subset=['Bowler'])
+            df_bowl.index = range(1, len(df_bowl) + 1)
+            df_bowl["ID"] = df_bowl['ID'].apply(lambda x: f'<a href="/scorecard/{x}">{x}</a>')
+            df_bowl = df_bowl.to_html(classes='table', escape=False)
         if view_format == "all" or view_format == 'fielder':
-            df_field_innings = detailed_stats.innings_by_innings_list_fieldings(cell_value, id_list)
-            df_field_innings = df_field_innings.dropna(subset=['Fielder'])
-            df_field_innings.index = range(1, len(df_field_innings) + 1)
-            df_field_innings["ID"] = df_field_innings['ID'].apply(lambda x: f'<a href="/scorecard/{x}">{x}</a>')
-            df_field_innings = df_field_innings.to_html(classes='table', escape=False)
+            df_field = detailed_stats.innings_by_innings_list_fieldings(cell_value, id_list)
+            df_field = df_field.dropna(subset=['Fielder'])
+            df_field.index = range(1, len(df_field) + 1)
+            df_field["ID"] = df_field['ID'].apply(lambda x: f'<a href="/scorecard/{x}">{x}</a>')
+            df_field = df_field.to_html(classes='table', escape=False)
     elif view_type == "reverse_cumulative":
         if view_format == "all" or view_format == 'batter':
-            df_bat_innings = detailed_stats.innings_by_innings_list_batting(cell_value, id_list)
-            df_bat_innings = df_bat_innings.dropna(subset=['batter'])
-            df_bat_innings.index = range(1, len(df_bat_innings) + 1)
-            df_bat_innings["ID"] = df_bat_innings['ID'].apply(lambda x: f'<a href="/scorecard/{x}">{x}</a>')
-            df_bat_innings = df_bat_innings.to_html(classes='table', escape=False)
+            df_bat = detailed_stats.innings_by_innings_list_batting(cell_value, id_list)
+            df_bat = df_bat.dropna(subset=['batter'])
+            df_bat.index = range(1, len(df_bat) + 1)
+            df_bat["ID"] = df_bat['ID'].apply(lambda x: f'<a href="/scorecard/{x}">{x}</a>')
+            df_bat = df_bat.to_html(classes='table', escape=False)
         if view_format == "all" or view_format == 'bowler':
-            df_bowl_innings = detailed_stats.innings_by_innings_list_bowling(cell_value, id_list)
-            df_bowl_innings = df_bowl_innings.dropna(subset=['Bowler'])
-            df_bowl_innings.index = range(1, len(df_bowl_innings) + 1)
-            df_bowl_innings["ID"] = df_bowl_innings['ID'].apply(lambda x: f'<a href="/scorecard/{x}">{x}</a>')
-            df_bowl_innings = df_bowl_innings.to_html(classes='table', escape=False)
+            df_bowl = detailed_stats.innings_by_innings_list_bowling(cell_value, id_list)
+            df_bowl = df_bowl.dropna(subset=['Bowler'])
+            df_bowl.index = range(1, len(df_bowl) + 1)
+            df_bowl["ID"] = df_bowl['ID'].apply(lambda x: f'<a href="/scorecard/{x}">{x}</a>')
+            df_bowl = df_bowl.to_html(classes='table', escape=False)
         if view_format == "all" or view_format == 'fielder':
-            df_field_innings = detailed_stats.innings_by_innings_list_fieldings(cell_value, id_list)
-            df_field_innings = df_field_innings.dropna(subset=['Fielder'])
-            df_field_innings.index = range(1, len(df_field_innings) + 1)
-            df_field_innings["ID"] = df_field_innings['ID'].apply(lambda x: f'<a href="/scorecard/{x}">{x}</a>')
-            df_field_innings = df_field_innings.to_html(classes='table', escape=False)
-    elif view_type == "series_averages":
+            df_field = detailed_stats.innings_by_innings_list_fieldings(cell_value, id_list)
+            df_field = df_field.dropna(subset=['Fielder'])
+            df_field.index = range(1, len(df_field) + 1)
+            df_field["ID"] = df_field['ID'].apply(lambda x: f'<a href="/scorecard/{x}">{x}</a>')
+            df_field = df_field.to_html(classes='table', escape=False)
+    elif view_type == "seasons":
         if view_format == "all" or view_format == 'batter':
-            df_bat_innings = detailed_stats.innings_by_innings_list_batting(cell_value, id_list)
-            df_bat_innings = df_bat_innings.dropna(subset=['batter'])
-            df_bat_innings.index = range(1, len(df_bat_innings) + 1)
-            df_bat_innings["ID"] = df_bat_innings['ID'].apply(lambda x: f'<a href="/scorecard/{x}">{x}</a>')
-            df_bat_innings = df_bat_innings.to_html(classes='table', escape=False)
+            df_bat = detailed_stats.player_batting_stats_season_wise(cell_value, start_date, end_date)
+            df_bat = df_bat.to_html(classes='table', escape=False)
         if view_format == "all" or view_format == 'bowler':
-            df_bowl_innings = detailed_stats.innings_by_innings_list_bowling(cell_value, id_list)
-            df_bowl_innings = df_bowl_innings.dropna(subset=['Bowler'])
-            df_bowl_innings.index = range(1, len(df_bowl_innings) + 1)
-            df_bowl_innings["ID"] = df_bowl_innings['ID'].apply(lambda x: f'<a href="/scorecard/{x}">{x}</a>')
-            df_bowl_innings = df_bowl_innings.to_html(classes='table', escape=False)
+            df_bowl = detailed_stats.player_bowling_stats_season_wise(cell_value, start_date, end_date)
+            df_bowl = df_bowl.to_html(classes='table', escape=False)
         if view_format == "all" or view_format == 'fielder':
-            df_field_innings = detailed_stats.innings_by_innings_list_fieldings(cell_value, id_list)
-            df_field_innings = df_field_innings.dropna(subset=['Fielder'])
-            df_field_innings.index = range(1, len(df_field_innings) + 1)
-            df_field_innings["ID"] = df_field_innings['ID'].apply(lambda x: f'<a href="/scorecard/{x}">{x}</a>')
-            df_field_innings = df_field_innings.to_html(classes='table', escape=False)
+            df_field = detailed_stats.player_stats_season_based_fielder(cell_value, start_date, end_date)
+            df_field = df_field.to_html(classes='table', escape=False)
     elif view_type == "ground_averages":
         if view_format == "all" or view_format == 'batter':
-            df_bat_innings = detailed_stats.innings_by_innings_list_batting(cell_value, id_list)
-            df_bat_innings = df_bat_innings.dropna(subset=['batter'])
-            df_bat_innings.index = range(1, len(df_bat_innings) + 1)
-            df_bat_innings["ID"] = df_bat_innings['ID'].apply(lambda x: f'<a href="/scorecard/{x}">{x}</a>')
-            df_bat_innings = df_bat_innings.to_html(classes='table', escape=False)
+            df_bat = detailed_stats.player_stats_venue_based_batting(cell_value, start_date, end_date)
+            df_bat.index = range(1, len(df_bat) + 1)
+            df_bat = df_bat.to_html(classes='table', escape=False)
         if view_format == "all" or view_format == 'bowler':
-            df_bowl_innings = detailed_stats.innings_by_innings_list_bowling(cell_value, id_list)
-            df_bowl_innings = df_bowl_innings.dropna(subset=['Bowler'])
-            df_bowl_innings.index = range(1, len(df_bowl_innings) + 1)
-            df_bowl_innings["ID"] = df_bowl_innings['ID'].apply(lambda x: f'<a href="/scorecard/{x}">{x}</a>')
-            df_bowl_innings = df_bowl_innings.to_html(classes='table', escape=False)
+            df_bowl = detailed_stats.player_stats_venue_based_bowler(cell_value, start_date, end_date)
+            df_bowl.index = range(1, len(df_bowl) + 1)
+            df_bowl = df_bowl.to_html(classes='table', escape=False)
         if view_format == "all" or view_format == 'fielder':
-            df_field_innings = detailed_stats.innings_by_innings_list_fieldings(cell_value, id_list)
-            df_field_innings = df_field_innings.dropna(subset=['Fielder'])
-            df_field_innings.index = range(1, len(df_field_innings) + 1)
-            df_field_innings["ID"] = df_field_innings['ID'].apply(lambda x: f'<a href="/scorecard/{x}">{x}</a>')
-            df_field_innings = df_field_innings.to_html(classes='table', escape=False)
+            df_field = detailed_stats.player_stats_venue_based_fielder(cell_value, start_date, end_date)
+            df_field.index = range(1, len(df_field) + 1)
+            df_field = df_field.to_html(classes='table', escape=False)
 
     # print("Playing Team:", playing_team, type(playing_team), len(playing_team))
     # print("Opposition:", opposition, type(opposition), len(opposition))
@@ -333,9 +302,9 @@ def process_stats_filter(cell_value, column_name):
                            match_result=match_result, 
                            view_format=view_format, 
                            view_type=view_type,
-                           df_bat_innings = df_bat_innings,
-                           df_bowl_innings = df_bowl_innings,
-                           df_field_innings = df_field_innings)
+                           df_bat = df_bat,
+                           df_bowl = df_bowl,
+                           df_field = df_field)
 
 
 if __name__ == '__main__':

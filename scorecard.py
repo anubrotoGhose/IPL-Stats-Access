@@ -115,3 +115,11 @@ def match_list():
     conn.close()
 
     return df_match_list
+
+
+def match_function(match_det):
+    XAi = "City = " + str(match_det[0]) + "year = " + str(match_det[1]) + "match_type = " + str(match_det[2]) + "venue/ground = " + str(match_det[3]) + "toss_Winner = " + str(match_det[4]) \
+        + "this team won the toss and choose to = " + str(match_det[5]) + "Super_Over Y/N = " + str(match_det[6]) + "Winning team is won by = " + str(match_det[7]) \
+        + "Won by Margin = " + str(match_det[9]) + " " + str (match_det[8]) + " " + str(match_det[10]) + "player of the match = " + str(match_det[11]) + "Umpires involved are " + str(match_det[12]) \
+        + "and" + str(match_det[13]) + "Date = " + str(match_det[14])
+    return XAi

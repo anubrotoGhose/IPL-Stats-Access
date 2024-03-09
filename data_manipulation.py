@@ -401,7 +401,7 @@ def batter_stats(player_name, start_date, end_date):
     batting_avg = np.nan if count == 0 else round(player_runs / count, 2)
     batting_strike_rate = np.nan if bowls_played(player_name, start_date, end_date) == 0 else round((player_runs*100) / bowls_played(player_name, start_date, end_date), 2)
     batter_dict = {}
-    batter_dict["Name"] = [player_name]
+    # batter_dict["Name"] = [player_name]
     batter_dict['Matches'] = [num_matches(player_name, start_date, end_date)]
     batter_dict['Innings'] = [batter_innings(player_name, start_date, end_date)]
     batter_dict['Runs'] = [player_runs]
@@ -464,7 +464,7 @@ def bowler_stats(player_name, start_date, end_date):
     bowling_strike_rate = np.nan if count == 0 else round(total_bowls(player_name, start_date, end_date) / count, 2)
     bowling_eco = np.nan if total_bowls(player_name, start_date, end_date) == 0 else round((player_runs*6) / total_bowls(player_name, start_date, end_date), 2)
     bowler_dict = {}
-    bowler_dict["Name"] = [player_name]
+    # bowler_dict["Name"] = [player_name]
     bowler_dict['Matches'] = [num_matches(player_name, start_date, end_date)]
     bowler_dict['Innings'] = [bowler_innings(player_name, start_date, end_date)]
     bowler_dict['Runs'] = [player_runs]
@@ -475,6 +475,36 @@ def bowler_stats(player_name, start_date, end_date):
     bowler_dict['Average'] = [bowling_avg]
     
     return bowler_dict
+
+def fielder_stats(player_name, start_date, end_date):
+    # Connect to the SQLite database
+    conn = sqlite3.connect('ipl_database.db')
+
+    # Read ipl_match_list and ipl_ball_by_ball tables into pandas dataframes
+    ipl_match_list = pd.read_sql_query("SELECT * FROM ipl_match_list", conn)
+    ipl_ball_by_ball = pd.read_sql_query("SELECT * FROM ipl_ball_by_ball", conn)
+    ipl_match_list = ipl_match_list[(ipl_match_list['Date'] >= start_date) & (ipl_match_list['Date'] <= end_date)]
+    # Close the database connection
+    conn.close()
+
+    # Merge the dataframes
+    merged_data = pd.merge(ipl_match_list, ipl_ball_by_ball, on='ID')
+
+    # Filter data for the specified player where catches or runouts occurred
+    player_fielding_data = merged_data[(merged_data['fielders_involved'].str.contains(player_name)) & 
+                                       (merged_data['kind'].isin(['caught', 'caught and bowled', 'run out', 'stumped']))]
+
+    # Group the data by the player involved in the fielding event and aggregate fielding statistics
+    player_fielding_stats = player_fielding_data.groupby('fielders_involved').agg(
+        catches=('kind', lambda x: ((x == 'caught') | (x == 'caught and bowled')).sum()),
+        run_outs=('kind', lambda x: (x == 'run out').sum()),
+        stumpings=('kind', lambda x: (x == 'stumped').sum())
+    )
+
+    # Reset index to make 'fielders_involved' a column instead of index
+    player_fielding_stats.reset_index(inplace=True)
+    player_fielding_stats.drop(columns=['fielders_involved'], inplace=True)
+    return player_fielding_stats
 
 def x_batter_stats(x):
     batter_dict = {}
