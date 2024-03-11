@@ -6,7 +6,9 @@ In the IPL-Stats-Explorer directory, follow these steps to run the application:
 
 1. Create a virtual environment:
 
-python -m venv projectvenv
+  ```
+  python -m venv projectvenv
+  ```
 
 
 2. Activate the virtual environment:
@@ -21,12 +23,19 @@ python -m venv projectvenv
 
 3. Install the required dependencies:
 
-pip install -r requirements.txt
-
+  ```
+  python -m venv projectvenv
+  ```
+  or
+  ```
+  python3 -m venv projectvenv
+  ```
 
 4. Deactivate the virtual environment:
 
-deactivate
+  ```
+  deactivate
+  ```
 
 
 ## Running the Application
@@ -47,7 +56,9 @@ To run the application after the initial setup:
 
 3. Deactivate the virtual environment when done:
 
-deactivate
+  ```
+  deactivate
+  ```
 
 
 Note: The `deactivate` command is used to deactivate the virtual environment.
