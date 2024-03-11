@@ -1,4 +1,4 @@
-# IPL Stats Explorer
+# IPL-Stats-Explorer
 
 In the IPL-Stats-Explorer directory, follow these steps to run the application:
 
