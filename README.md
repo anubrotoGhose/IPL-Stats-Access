@@ -1,57 +1,47 @@
-# IPL-Stats-Explorer
+IPL Stats Explorer
 
 In the IPL-Stats-Explorer directory, follow these steps to run the application:
+First-Time Setup
 
-## First-Time Setup
-
-1. Create a virtual environment:
+    Create a virtual environment:
 
 python -m venv projectvenv
 
+    Activate the virtual environment:
 
-2. Activate the virtual environment:
-- For Windows:
-  ```
-  ./projectvenv/Scripts/activate
-  ```
-- For Linux/Mac/Unix:
-  ```
-  source projectvenv/bin/activate
-  ```
+    For Windows:
 
-3. Install the required dependencies:
+    ./projectvenv/Scripts/activate
+
+For Linux/Mac/Unix:
+
+source projectvenv/bin/activate
+
+    Install the required dependencies:
 
 pip install -r requirements.txt
 
-
-4. Deactivate the virtual environment:
+    Deactivate the virtual environment:
 
 deactivate
-
-
-## Running the Application
+Running the Application
 
 To run the application after the initial setup:
 
-1. Activate the virtual environment:
-- For Windows:
-  ```
-  ./projectvenv/Scripts/activate
-  ```
-- For Linux/Mac/Unix:
-  ```
-  source projectvenv/bin/activate
-  ```
+    Activate the virtual environment:
 
-2. Run the application.
+    For Windows:
 
-3. Deactivate the virtual environment when done:
+    ./projectvenv/Scripts/activate
+
+For Linux/Mac/Unix:
+
+source projectvenv/bin/activate
+
+    Run the application.
+
+    Deactivate the virtual environment when done:
 
 deactivate
 
-
-<<<<<<< HEAD
-Note: The `deactivate` command is used to deactivate the virtual environment.
-=======
-Note: The `deactivate` command is used to deactivate the virtual environment.
->>>>>>> d467f6d52688cc20d7d3ba2f7b1c5df8bbec92e2
+Note: The deactivate command is used to deactivate the virtual environment.
