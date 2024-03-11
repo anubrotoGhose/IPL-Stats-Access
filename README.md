@@ -1,4 +1,4 @@
-# IPL Stats Explorer
+# IPL-Stats-Explorer
 
 In the IPL-Stats-Explorer directory, follow these steps to run the application:
 
@@ -50,4 +50,8 @@ To run the application after the initial setup:
 deactivate
 
 
+<<<<<<< HEAD
 Note: The `deactivate` command is used to deactivate the virtual environment.
+=======
+Note: The `deactivate` command is used to deactivate the virtual environment.
+>>>>>>> d467f6d52688cc20d7d3ba2f7b1c5df8bbec92e2
