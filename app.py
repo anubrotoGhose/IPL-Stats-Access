@@ -1,4 +1,6 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, send_file
+from io import StringIO
+from io import BytesIO
 import pandas as pd
 import search_results
 import data_manipulation
@@ -305,6 +307,20 @@ def process_stats_filter(cell_value, column_name):
                            df_bat = df_bat,
                            df_bowl = df_bowl,
                            df_field = df_field)
+
+
+@app.route('/download_csv', methods=['POST'])
+def download_csv():
+    html_data = request.form['csv_data']
+    
+    # print(html_data)
+    df = pd.read_html(BytesIO(html_data.encode()))[0]
+    df.drop(columns=['Unnamed: 0'], inplace=True)
+    # print(df)
+    buffer = BytesIO()
+    df.to_csv(buffer, index=False, encoding='utf-8')
+    buffer.seek(0)
+    return send_file(buffer, as_attachment=True, mimetype='text/csv', download_name='ipl_stats.csv')
 
 
 if __name__ == '__main__':

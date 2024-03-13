@@ -26,21 +26,40 @@
         <table>
             {{ df_bat|safe }}
         </table>
-        
     </div>
+    <h2>Download CSV</h2>
+    <div class="download-csv">
+        <form action="{{ url_for('download_csv') }}" method="POST">
+            <input type="hidden" name="csv_data" value="{{ df_bat}}">
+            <button type="submit" class="btn btn-primary">Download CSV</button>
+        </form>
+    </div>
+
     <h2>Bowling Stats</h2>
     <div class="content">
         <table>
             {{ df_bowl|safe }}
         </table>
-        
     </div>
+    <h2>Download CSV</h2>
+    <div class="download-csv">
+        <form action="{{ url_for('download_csv') }}" method="POST">
+            <input type="hidden" name="csv_data" value="{{ df_bowl}}">
+            <button type="submit" class="btn btn-primary">Download CSV</button>
+        </form>
+    </div> 
     <h2>Fielding Stats</h2>
     <div class="content">
         <table>
             {{ df_field|safe }}
         </table>
-        
+    </div>
+    <h2>Download CSV</h2>
+    <div class="download-csv">
+        <form action="{{ url_for('download_csv') }}" method="POST">
+            <input type="hidden" name="csv_data" value="{{ df_field}}">
+            <button type="submit" class="btn btn-primary">Download CSV</button>
+        </form>
     </div>
 </body>
 </html>
