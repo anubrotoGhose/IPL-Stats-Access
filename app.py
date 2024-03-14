@@ -141,41 +141,19 @@ def highest_sixers():
 @app.route('/process_stats_filter/<cell_value>/<column_name>', methods=['POST'])
 def process_stats_filter(cell_value, column_name):
     
-    playing_team = request.form.get('playing_team')
-    opposition = request.form.get('opposition')
-    ground = request.form.get('ground')
+    
     start_date = request.form.get('start_date')
     end_date = request.form.get('end_date')
-    season = request.form.get('season')
-    match_result = request.form.getlist('match_result')
     view_format = request.form.get('view_format')
     view_type = request.form.get('view_type')
     id_list, date_list, team1_list, team2_list, v = detailed_stats.get_match_ids_and_teams_for_player(cell_value, start_date, end_date)
     # print(id_list,"\n" , date_list,"\n", team1_list,"\n", team2_list,"\n", v)
-    playing_team_tuple = tuple(team1_list)
-    opposition_tuple = tuple(playing_team)
-    ground_tuple = tuple(ground)
-    season_tuple = tuple(season)
+    
 
     df_bat = None
     df_bowl = None
     df_field = None
-    if playing_team != "all":
-        team1_list = [playing_team]
-
-    if opposition != "all":
-        team1_list = [opposition]
     
-    if ground != "all":
-        v = [ground]
-    
-    if season != "all":
-        seasons =  [season]
-
-    if len(match_result)==0 or len(match_result)==3:
-        pass
-    else:
-        match_result_tuple = tuple(match_result)
     if view_format == None:
         view_format = "all"
     else:
@@ -295,13 +273,10 @@ def process_stats_filter(cell_value, column_name):
     return render_template('detailed_filtered_stats_page.html',
                            cell_value = cell_value,
                            column_name = column_name,
-                           playing_team=playing_team, 
-                           opposition=opposition, 
-                           ground=ground, 
+                           playing_team = team1_list,
+                           opposition = team2_list,
                            start_date=start_date, 
                            end_date=end_date, 
-                           season=season, 
-                           match_result=match_result, 
                            view_format=view_format, 
                            view_type=view_type,
                            df_bat = df_bat,

@@ -12,17 +12,13 @@
         <p>Category: {{ column_name }}</p>
         <p>Playing Team: {{ playing_team }}</p>
         <p>Opposition: {{ opposition }}</p>
-        <p>Venue: {{ ', '.join(venue) }}</p>
-        <p>Ground: {{ ground }}</p>
         <p>Start Date: {{ start_date }}</p>
         <p>End Date: {{ end_date }}</p>
-        <p>Season: {{ season }}</p>
-        <p>Match Result: {{ ', '.join(match_result) }}</p>
         <p>View Format: {{ view_format }}</p>
         <p>View Type: {{ view_type }}</p>
     </div>
     <h2>Batting Stats</h2>
-    <div class="content">
+    <div class="content-large">
         <table>
             {{ df_bat|safe }}
         </table>
@@ -31,12 +27,12 @@
     <div class="download-csv">
         <form action="{{ url_for('download_csv') }}" method="POST">
             <input type="hidden" name="csv_data" value="{{ df_bat}}">
-            <button type="submit" class="btn btn-primary">Download CSV</button>
+            <button type="submit" class="btnn btn-primary">Download CSV</button>
         </form>
     </div>
 
     <h2>Bowling Stats</h2>
-    <div class="content">
+    <div class="content-large">
         <table>
             {{ df_bowl|safe }}
         </table>
@@ -45,11 +41,11 @@
     <div class="download-csv">
         <form action="{{ url_for('download_csv') }}" method="POST">
             <input type="hidden" name="csv_data" value="{{ df_bowl}}">
-            <button type="submit" class="btn btn-primary">Download CSV</button>
+            <button type="submit" class="btnn btn-primary">Download CSV</button>
         </form>
     </div> 
     <h2>Fielding Stats</h2>
-    <div class="content">
+    <div class="content-large">
         <table>
             {{ df_field|safe }}
         </table>
@@ -58,7 +54,7 @@
     <div class="download-csv">
         <form action="{{ url_for('download_csv') }}" method="POST">
             <input type="hidden" name="csv_data" value="{{ df_field}}">
-            <button type="submit" class="btn btn-primary">Download CSV</button>
+            <button type="submit" class="btnn btn-primary">Download CSV</button>
         </form>
     </div>
 </body>

@@ -7,40 +7,40 @@
 <body>
     <h1>IPL Stats Explorer</h1>
     <div class="content">
-      <h2>Match Details</h2>
-      <h1>Innings 1</h1>
-      <h2>{{ match_det|safe }}</h2>
-      <div id="bowling-stats">
-        <table>
-            {{ batting_1|safe }}
-        </table>
-        <h1> </h1>
+        <h2>Match Details</h2>
+        <h1>Innings 1</h1>
+        <h2>{{ match_det|safe }}</h2>
+        <div id="bowling-stats">
+            <table>
+                {{ batting_1|safe }}
+            </table>
+            <h1> </h1>
         </div>
-          {{ rp_1 }}
+        {{ rp_1 }}
+        <div>
+            <h1> </h1>
         </div>
-        <h1> </h1>
-      </div>
-      <div id="bowling-stats">
-        <table>
-          {{ bowling_1|safe }}
-        </table>
-      </div>
-      <h1>Innings 2</h1>
-      <div id="bowling-stats">
-        <table>
-          {{ batting_2|safe }}
-        </table>
-        <h1> </h1>
+        <div id="bowling-stats">
+            <table>
+                {{ bowling_1|safe }}
+            </table>
         </div>
-          {{ rp_2 }}
+        <h1>Innings 2</h1>
+        <div id="bowling-stats">
+            <table>
+                {{ batting_2|safe }}
+            </table>
+            <h1> </h1>
+            <div>
+                {{ rp_2 }}
+            </div>
+            <h1> </h1>
         </div>
-        <h1> </h1>
-      </div>
-      
-      <div id="bowling-stats">
-        <table>
-          {{ bowling_2|safe }}
-        </table>
-  </div>
+        <div id="bowling-stats">
+            <table>
+                {{ bowling_2|safe }}
+            </table>
+        </div>
+    </div>
 </body>
 </html>

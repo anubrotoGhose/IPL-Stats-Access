@@ -6,6 +6,48 @@ body {
     text-align: center;
     padding: 50px;
 }
+.content-large {
+    overflow-x: auto;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.content {
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+p {
+    margin-bottom: 10px;
+}
+
+.btn {
+    display: inline-block;
+    padding: 8px 16px;
+    background-color: #007bff;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 3px;
+}
+
+.btn:hover {
+    background-color: #0056b3;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    font-weight: bold;
+}
 
 h1 {
     color: #333;
@@ -47,6 +89,18 @@ input[type="submit"]:hover {
 }
 
 
+input[type="date"],
+
+
+
+.radio-group {
+    margin-bottom: 10px;
+}
+
+.radio-group label {
+    margin-right: 10px;
+}
+
 .result {
     color: blue;
     font-size: 20px;
@@ -61,6 +115,7 @@ input[type="submit"]:hover {
 .table, .table th, .table td {
     border: 1px solid #ddd;
     padding: 8px;
+    
 }
 .table th {
     padding-top: 12px;
@@ -71,6 +126,9 @@ input[type="submit"]:hover {
 }
 .table-striped tr:nth-child(even) {
     background-color: #f2f2f2;
+    
+    
+    
 }
 
 slider {
@@ -159,4 +217,58 @@ font-size: 16px;
 .Profile-to-Stats-Filter {
     background-color: #04AA6D; /* Change the color on hover */
     color: #fff;
+}
+.home_table {
+    width: 100%;
+    margin: 20px auto; /* Adjust margin as needed */
+    border-collapse: collapse;
+}
+
+.home_table th {
+    background-color: #f2f2f2; /* Light gray background for table headers */
+    border: 1px solid #ddd; /* Add borders to table cells */
+    padding: 8px;
+}
+
+.home_table th a {
+    text-decoration: none; /* Remove underline from hyperlinks */
+    color: #333; /* Set text color for hyperlinks */
+    display: block; /* Display hyperlinks as block elements */
+    padding: 8px;
+}
+
+.home_table th a:hover {
+    background-color: #ddd; /* Light gray background on hover */
+}
+
+.home_table td {
+    border: 1px solid #ddd; /* Add borders to table cells */
+    padding: 8px;
+}
+
+/* Optional: Style for alternate row background color */
+.home_table tr:nth-child(even) {
+    background-color: #f9f9f9; /* Light gray background for even rows */
+}
+
+.matchlist {
+    margin: 20px auto; /* Adjust margin as needed */
+}
+
+.matchlist p {
+    text-align: center; /* Center-align the paragraph */
+}
+
+.matchlist a {
+    display: block; /* Display the link as a block element */
+    padding: 10px;
+    background-color: #f2f2f2; /* Light gray background */
+    color: #333; /* Text color */
+    text-decoration: none; /* Remove underline from link */
+    border-radius: 5px; /* Rounded corners */
+    margin-bottom: 10px; /* Space between links */
+}
+
+.matchlist a:hover {
+    background-color: #ddd; /* Light gray background on hover */
 }

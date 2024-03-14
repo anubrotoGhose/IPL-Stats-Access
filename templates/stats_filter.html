@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Stats Filter Page</title>
-    <!-- <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}"> -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
     <div class="content">
@@ -13,8 +13,7 @@
         <a href="{{ url_for('profile_page', column_name=column_name, value=cell_value) }}" class="btn btn-primary">Back to Profile Page</a>
 
         <form action="{{ url_for('process_stats_filter', cell_value=cell_value, column_name=column_name) }}" method="POST">
-            
-            <!-- Playing Team -->
+            <!-- Playing Team
             <div class="form-group">
                 <label for="playing_team">Playing Team:</label>
                 <select id="playing_team" name="playing_team">
@@ -23,9 +22,9 @@
                         <option value="{{ team }}">{{ team }}</option>
                     {% endfor %}
                 </select>
-            </div>
-        
-            <!-- Opposition -->
+            </div> -->
+
+            <!-- Opposition
             <div class="form-group">
                 <label for="opposition">Opposition:</label>
                 <select id="opposition" name="opposition">
@@ -34,9 +33,9 @@
                         <option value="{{ team }}">{{ team }}</option>
                     {% endfor %}
                 </select>
-            </div>
-        
-            <!-- Ground -->
+            </div> -->
+
+            <!-- Ground
             <div class="form-group">
                 <label for="ground">Ground:</label>
                 <select id="ground" name="ground">
@@ -45,21 +44,21 @@
                         <option value="{{ venue }}">{{ venue }}</option>
                     {% endfor %}
                 </select>
-            </div>
-        
+            </div> -->
+
             <!-- Starting date -->
             <div class="form-group">
                 <label for="start_date">Starting date:</label>
                 <input type="date" id="start_date" name="start_date" value="{{ debut_date }}">
             </div>
-        
+
             <!-- End date -->
             <div class="form-group">
                 <label for="end_date">End date:</label>
                 <input type="date" id="end_date" name="end_date" value="{{ last_match_date }}">
             </div>
-        
-            <!-- Season -->
+
+            <!-- Season
             <div class="form-group">
                 <label for="season">Season:</label>
                 <select id="season" name="season">
@@ -68,9 +67,9 @@
                         <option value="{{ season }}">{{ season }}</option>
                     {% endfor %}
                 </select>
-            </div>
-        
-            <!-- Match result -->
+            </div> -->
+
+            <!-- Match result
             <div class="form-group">
                 <label>Match Result:</label>
                 <div>
@@ -85,8 +84,8 @@
                     <input type="checkbox" id="drawn_match" name="match_result" value="drawn_match">
                     <label for="drawn_match">Drawn Match</label>
                 </div>
-            </div>
-        
+            </div> -->
+
             <!-- View format -->
             <div class="form-group">
                 <label>View Format:</label>
@@ -107,21 +106,18 @@
                     <label for="fielding_formats">Fielding Formats</label>
                 </div>
             </div>
-        
+
             <!-- View Type -->
             <div class="form-group">
                 <label>View Type:</label>
                 <select id="view_type" name="view_type">
                     <option value="career_summary">Career Summary</option>
                     <option value="innings_by_innings_list">Innings by Innings List</option>
-                    <option value="match_by_match_list">Match by Match List</option>
-                    <option value="cumulative_averages">Cumulative Averages</option>
-                    <option value="reverse_cumulative">Reverse Cumulative</option>
                     <option value="seasons">seasons</option>
                     <option value="ground_averages">Ground Averages</option>
                 </select>
             </div>
-        
+
             <!-- Submit button -->
             <div class="form-group">
                 <input type="submit" value="Filter Stats">
