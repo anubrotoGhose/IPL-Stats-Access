@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>IPL Access</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <h1>IPL Stats Explorer</h1>
+    <h1>Enter the name of a player, team, ground or umpire/referee:</h1>
+    <form method="POST">
+        <input type="text" name="user_input" />
+        <input type="submit" value="Search" />
+    </form>
+    <p><a href="/matchlists">View IPL Match Lists</a></p>
+    <center>
+    <div class = "home_table">
+    <table>
+        <tr>
+          <th><a href="/top_partnerships">Top 10 partnerships</a></th>
+          <th><a href="/season_partnerships">season partnerships</a></th>
+          <th><a href="/player_of_the_match">Players With Most Player Of the Match W.R.T Season</a></th>
+          
+        </tr>
+        <tr>
+          <th><a href="/top_batsmen">Top 10 batsmen</a></th>
+          <th><a href="/top_batsman_score">Top batsmen</a></th>
+          <th><a href="/select_batsmen_across_seasons">Select batsmen across seasons</a></th>
+        </tr>
+        <tr>
+          <th><a href="/hatricks">Hatricks</a></th>
+          <th><a href="/highest_four_hitters">Highest Four Hitters</a></th>
+          <th><a href="/highest_sixers">Highest Sixers</a></th>
+        </tr>
+      </table>
+    </div>
+    </center>
+</body>
+</html>
