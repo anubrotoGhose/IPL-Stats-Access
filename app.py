@@ -80,8 +80,6 @@ def profile_page(column_name):
                            table_html_bowler = table_html_bowler, 
                            table_html_fielder = table_html_fielder)
 
-    elif column_name == 'Venues':
-        first_match_date, last_match_date = venue_stats.get_first_and_last_match_dates(cell_value)
     else:
         df_batter = pd.DataFrame(data_manipulation.x_batter_stats(cell_value)) # Add Start and End Date
         df_bowler = pd.DataFrame(data_manipulation.x_bowler_stats(cell_value)) # Add Start and End Date
