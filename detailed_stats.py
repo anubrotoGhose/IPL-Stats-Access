@@ -442,34 +442,40 @@ def player_bowling_stats_season_wise(player_name, start_date, end_date):
     # Connect to the SQLite database
     conn = sqlite3.connect('ipl_database.db')
 
-    # Define the SQL query to retrieve bowling stats season-wise for the specified player within the date range
-    query = """
-        SELECT
-            ipl_match_list.Season AS Season,
-            COUNT(DISTINCT ipl_match_list.ID) AS Matches,
-            COUNT(DISTINCT ipl_ball_by_ball.innings) AS Innings,
-            SUM(ipl_ball_by_ball.total_run) AS Runs,
-            SUM(CASE WHEN ipl_ball_by_ball.player_out = ? THEN 1 ELSE 0 END) AS Wickets,
-            ROUND(SUM(ipl_ball_by_ball.total_run) * 6.0 / NULLIF(SUM(ipl_ball_by_ball.ballnumber), 0), 2) AS Economy,
-            SUM(ipl_ball_by_ball.ballnumber) AS Balls,
-            ROUND(SUM(CASE WHEN ipl_ball_by_ball.player_out = ? THEN 1 ELSE 0 END) * 100.0 / NULLIF(SUM(ipl_ball_by_ball.isWicketDelivery), 0), 2) AS StrikeRate,
-            ROUND(SUM(ipl_ball_by_ball.total_run) * 1.0 / NULLIF(SUM(CASE WHEN ipl_ball_by_ball.player_out = ? THEN 1 ELSE 0 END), 0), 2) AS Average
-        FROM
-            ipl_ball_by_ball
-        JOIN
-            ipl_match_list ON ipl_ball_by_ball.ID = ipl_match_list.ID
-        WHERE
-            ipl_ball_by_ball.bowler = ? AND ipl_match_list.Date BETWEEN ? AND ?
-        GROUP BY
-            ipl_match_list.Season
-        ORDER BY
-            ipl_match_list.Season
-    """
-
-    # Execute the query and fetch the results
-    bowling_stats_season_wise = pd.read_sql_query(query, conn, params=(player_name, player_name, player_name, player_name, start_date, end_date))
+    # Read ipl_match_list and ipl_ball_by_ball tables into pandas dataframes
+    ipl_match_list = pd.read_sql_query("SELECT * FROM ipl_match_list", conn)
+    ipl_ball_by_ball = pd.read_sql_query("SELECT * FROM ipl_ball_by_ball", conn)
+    
+    # Filter matches based on start_date and end_date
+    ipl_match_list['Date'] = pd.to_datetime(ipl_match_list['Date'])
+    ipl_match_list = ipl_match_list[(ipl_match_list['Date'] >= start_date) & (ipl_match_list['Date'] <= end_date)]
 
     # Close the database connection
     conn.close()
 
-    return bowling_stats_season_wise
+    # Merge the dataframes
+    merged_data = pd.merge(ipl_match_list, ipl_ball_by_ball, on='ID')
+
+    # Filter data for matches where the specified player bowled
+    player_data = merged_data[merged_data['bowler'] == player_name]
+
+    # Group by venue and aggregate bowling statistics
+    season_stats = player_data.groupby('Season').agg(
+        runs_conceded=('total_run', 'sum'),
+        wickets_taken=('isWicketDelivery', 'sum'),
+        balls_bowled=('ballnumber', 'count'),
+        fours=('total_run', lambda x: ((x == 4) | (x == 5)).sum()),  # Assuming 5 denotes no-ball in total_run
+        sixes=('total_run', lambda x: ((x == 6) | (x == 7)).sum()),  # Assuming 7 denotes wide in total_run
+    )
+
+    # Calculate bowling strike rate
+    season_stats['Strike_Rate'] = season_stats['balls_bowled'] / season_stats['wickets_taken']
+
+    # Calculate average runs per wicket
+    season_stats['Average'] = season_stats['runs_conceded'] / season_stats['wickets_taken'].replace(0, pd.NA)
+
+    # Reset index to make Venue a column instead of index
+    season_stats.reset_index(inplace=True)
+
+    # Display the venue-wise bowling statistics
+    return season_stats

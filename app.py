@@ -1,6 +1,7 @@
-from flask import Flask, render_template, request, redirect, url_for, session, send_file
+from flask import Flask, render_template, request, redirect, url_for, session, send_file, jsonify
 from io import StringIO
 from io import BytesIO
+import sqlite3
 import pandas as pd
 import search_results
 import data_manipulation
@@ -45,7 +46,7 @@ def show_scorecard(id):
     rp_2="Batters remaining:"+str(rp_2)
     match_det = scorecard.match_details(id)
     x = scorecard.match_function(match_det)
-    print(x)
+    # print(x)
     return render_template('show_scorecard.html',match_det=match_det, batting_1=batting_1, bowling_1 = bowling_1,rp_1=rp_1, batting_2=batting_2, bowling_2=bowling_2, rp_2=rp_2)
 
 @app.route('/searchresults/<user_input>')
@@ -63,11 +64,21 @@ def profile_page(column_name):
     cell_value = request.args.get('value')
     df_batter = pd.DataFrame()
     df_bowler = pd.DataFrame()
+    df_fielder = pd.DataFrame()
     if column_name == 'Players':
         first_match_date, last_match_date = data_manipulation.get_first_and_last_match_dates(cell_value)
         df_batter = pd.DataFrame(data_manipulation.batter_stats(cell_value, first_match_date, last_match_date)) # Add Start and End Date
         df_bowler = pd.DataFrame(data_manipulation.bowler_stats(cell_value, first_match_date, last_match_date))
         df_fielder = data_manipulation.fielder_stats(cell_value, first_match_date, last_match_date)
+        table_html_batter = df_batter.to_html(classes='table')
+        table_html_bowler = df_bowler.to_html(classes='table')
+        table_html_fielder = df_fielder.to_html(classes='table')
+        return render_template('profile_page.html', 
+                           column_name=column_name, 
+                           cell_value=cell_value, 
+                           table_html_batter=table_html_batter, 
+                           table_html_bowler = table_html_bowler, 
+                           table_html_fielder = table_html_fielder)
 
     elif column_name == 'Venues':
         first_match_date, last_match_date = venue_stats.get_first_and_last_match_dates(cell_value)
@@ -77,12 +88,11 @@ def profile_page(column_name):
     table_html_batter = df_batter.to_html(classes='table')
     table_html_bowler = df_bowler.to_html(classes='table')
     table_html_fielder = df_fielder.to_html(classes='table')
-    return render_template('profile_page.html', 
+    return render_template('profile_page_other.html', 
                            column_name=column_name, 
                            cell_value=cell_value, 
                            table_html_batter=table_html_batter, 
-                           table_html_bowler = table_html_bowler, 
-                           table_html_fielder = table_html_fielder)
+                           table_html_bowler = table_html_bowler)
 
 @app.route('/stats_filter/<cell_value>/<column_name>')
 def stats_filter(cell_value, column_name):
@@ -137,6 +147,105 @@ def highest_four_hitters():
 @app.route('/highest_sixers')
 def highest_sixers():
     return render_template('highest_sixers.html')
+
+@app.route('/runs_scored')
+def runs_scored():
+    # Connect to the database
+    conn = sqlite3.connect('./ipl_database.db')
+
+    df = pd.read_sql_query("SELECT * FROM ipl_batter_list ORDER BY Runs DESC LIMIT 50", conn)
+
+    conn.close()
+
+    # Display the DataFrame
+    df.index = range(1, len(df) + 1)
+    table = df.to_html(classes='table')
+    return render_template('top_players.html',
+                           heading = "Top Batters By Runs Scored",
+                           table=table)
+
+@app.route('/top_batting_averages')
+def top_batting_averages():
+    # Connect to the database
+    conn = sqlite3.connect('./ipl_database.db')
+
+    df = pd.read_sql_query("SELECT * FROM ipl_batter_list WHERE Balls >= 60 ORDER BY Average DESC", conn)
+
+    # Close the connection
+    conn.close()
+    df.index = range(1, len(df) + 1)
+    table = df.to_html(classes='table')
+    return render_template('top_players.html',
+                           heading = "Top Batters By Batting Average",
+                           table=table)
+
+@app.route('/top_batting_strike_rates')
+def top_batting_strike_rates():
+    # Connect to the database
+    conn = sqlite3.connect('./ipl_database.db')
+
+    df = pd.read_sql_query("SELECT * FROM ipl_batter_list WHERE Balls >= 60 ORDER BY Strike_Rate DESC", conn)
+
+    # Close the connection
+    conn.close()
+    df.index = range(1, len(df) + 1)
+    # Display the DataFrame
+    table = df.to_html(classes='table')
+    return render_template('top_players.html',
+                           heading = "Top Batters By Batting Strike Rates",
+                           table=table)
+
+@app.route('/wickets_taken')
+def wickets_taken():
+    # Connect to the database
+    conn = sqlite3.connect('./ipl_database.db')
+
+    df = pd.read_sql_query("SELECT * FROM ipl_bowler_list ORDER BY Wickets DESC LIMIT 50", conn)
+
+    # Close the connection
+    conn.close()
+
+    # Display the DataFrame
+    df.index = range(1, len(df) + 1)
+    table = df.to_html(classes='table')
+    return render_template('top_players.html',
+                           heading = "Top Bowlers By Wickets Taken",
+                           table=table)
+
+@app.route('/top_bowling_averages')
+def top_bowling_averages():
+    # Connect to the database
+    conn = sqlite3.connect('./ipl_database.db')
+
+    df = pd.read_sql_query("SELECT * FROM ipl_bowler_list WHERE Wickets >= 60 ORDER BY Average ASC", conn)
+
+    # Close the connection
+    conn.close()
+
+    # Display the DataFrame
+    df.index = range(1, len(df) + 1)
+    table = df.to_html(classes='table')
+    return render_template('top_players.html',
+                           heading = "Top Bowlers By Bowling Average",
+                           table=table)
+
+@app.route('/top_bowling_economy')
+def top_bowling_economy():
+    # Connect to the database
+    conn = sqlite3.connect('./ipl_database.db')
+
+    df = pd.read_sql_query("SELECT * FROM ipl_bowler_list WHERE Wickets >= 40 ORDER BY Economy ASC", conn)
+
+    # Close the connection
+    conn.close()
+
+    # Display the DataFrame
+    df.index = range(1, len(df) + 1)
+    table = df.to_html(classes='table')
+    return render_template('top_players.html',
+                           heading = "Top Bowlers by Economy",
+                           table=table)
+
 
 @app.route('/process_stats_filter/<cell_value>/<column_name>', methods=['POST'])
 def process_stats_filter(cell_value, column_name):
@@ -258,17 +367,6 @@ def process_stats_filter(cell_value, column_name):
             df_field.index = range(1, len(df_field) + 1)
             df_field = df_field.to_html(classes='table', escape=False)
 
-    # print("Playing Team:", playing_team, type(playing_team), len(playing_team))
-    # print("Opposition:", opposition, type(opposition), len(opposition))
-    # print("Ground:", ground, type(ground), len(ground))
-    # print("Start Date:", start_date, type(start_date), len(start_date))
-    # print("End Date:", end_date, type(end_date), len(end_date))
-    # print("Season:", season, type(season), len(season))
-    # print("Match Result:", match_result, type(match_result), len(match_result))
-    # print("View Format:", view_format, type(view_format))
-    # print("View Type:", view_type, type(view_type), len(view_type))
-
-
 
     return render_template('detailed_filtered_stats_page.html',
                            cell_value = cell_value,
@@ -286,16 +384,16 @@ def process_stats_filter(cell_value, column_name):
 
 @app.route('/download_csv', methods=['POST'])
 def download_csv():
-    html_data = request.form['csv_data']
-    
-    # print(html_data)
-    df = pd.read_html(BytesIO(html_data.encode()))[0]
-    df.drop(columns=['Unnamed: 0'], inplace=True)
-    # print(df)
-    buffer = BytesIO()
-    df.to_csv(buffer, index=False, encoding='utf-8')
-    buffer.seek(0)
-    return send_file(buffer, as_attachment=True, mimetype='text/csv', download_name='ipl_stats.csv')
+    html_data = request.form.get('csv_data')
+    if html_data is not None:
+        df = pd.read_html(BytesIO(html_data.encode()))[0]
+        df.drop(columns=['Unnamed: 0'], inplace=True)
+        buffer = BytesIO()
+        df.to_csv(buffer, index=False, encoding='utf-8')
+        buffer.seek(0)
+        return send_file(buffer, as_attachment=True, mimetype='text/csv', download_name='ipl_stats.csv')
+    else:
+        render_template('detailed_filtered_stats_page.html')
 
 
 if __name__ == '__main__':
