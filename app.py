@@ -1,11 +1,9 @@
 from flask import Flask, render_template, request, redirect, url_for, session, send_file, jsonify
-from io import StringIO
 from io import BytesIO
 import sqlite3
 import pandas as pd
 import search_results
 import data_manipulation
-import venue_stats
 import detailed_stats
 import scorecard
 import ast
@@ -286,26 +284,26 @@ def process_stats_filter(cell_value, column_name):
             df_field = df_field.to_html(classes='table', escape=False)
     elif view_type == "innings_by_innings_list":
         if view_format == "all" or view_format == 'batter':
-            df_bat = detailed_stats.innings_by_innings_list_batting(cell_value, id_list)
-            df_bat = df_bat.dropna(subset=['batter'])
+            df_bat = detailed_stats.innings_by_innings_list_batting(cell_value, start_date, end_date)
+            # df_bat = df_bat.dropna(subset=['batter'])
             df_bat.index = range(1, len(df_bat) + 1)
             df_bat["ID"] = df_bat['ID'].apply(lambda x: f'<a href="/scorecard/{x}">{x}</a>')
             df_bat = df_bat.to_html(classes='table', escape=False)
         if view_format == "all" or view_format == 'bowler':
-            df_bowl = detailed_stats.innings_by_innings_list_bowling(cell_value, id_list)
-            df_bowl = df_bowl.dropna(subset=['Bowler'])
+            df_bowl = detailed_stats.innings_by_innings_list_bowling(cell_value, start_date, end_date)
+            # df_bowl = df_bowl.dropna(subset=['Bowler'])
             df_bowl.index = range(1, len(df_bowl) + 1)
             df_bowl["ID"] = df_bowl['ID'].apply(lambda x: f'<a href="/scorecard/{x}">{x}</a>')
             df_bowl = df_bowl.to_html(classes='table', escape=False)
         if view_format == "all" or view_format == 'fielder':
-            df_field = detailed_stats.innings_by_innings_list_fieldings(cell_value, id_list)
+            df_field = detailed_stats.innings_by_innings_list_fieldings(cell_value, start_date, end_date)
             df_field = df_field.dropna(subset=['Fielder'])
             df_field.index = range(1, len(df_field) + 1)
             df_field["ID"] = df_field['ID'].apply(lambda x: f'<a href="/scorecard/{x}">{x}</a>')
             df_field = df_field.to_html(classes='table', escape=False)
     elif view_type == "cumulative_averages":
         if view_format == "all" or view_format == 'batter':
-            df_bat = detailed_stats.innings_by_innings_list_batting(cell_value, id_list)
+            df_bat = detailed_stats.innings_by_innings_list_batting(cell_value, start_date, end_date)
             df_bat = df_bat.dropna(subset=['batter'])
             df_bat.index = range(1, len(df_bat) + 1)
             df_bat["ID"] = df_bat['ID'].apply(lambda x: f'<a href="/scorecard/{x}">{x}</a>')
@@ -393,4 +391,5 @@ def download_csv():
     else:
         render_template('detailed_filtered_stats_page.html')
 
-
+if __name__ == '__main__':
+    app.run(debug=True)
