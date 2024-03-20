@@ -116,6 +116,18 @@ def innings_by_innings_list_bowling(player_name, start_date, last_date):
         SUM(CASE WHEN extra_type IS NULL OR extra_type = 'noballs' OR extra_type = 'wides' THEN total_run ELSE 0 END) AS runs_conceded,
         SUM(CASE WHEN isWicketDelivery = 1 AND kind != 'run out' THEN 1 ELSE 0 END) AS wickets_taken,
         COUNT(CASE WHEN extra_type IS NULL OR extra_type LIKE "%byes%" THEN 1 END) AS balls_bowled,
+        CAST((COUNT(CASE WHEN extra_type IS NULL OR extra_type LIKE '%byes%' THEN 1 ELSE 0 END) - 
+        SUM(CASE WHEN extra_type = 'wides' THEN 1 ELSE 0 END) - 
+        SUM(CASE WHEN extra_type = 'noballs' THEN 1 ELSE 0 END)) / 6 AS TEXT) || '.' ||
+        ((COUNT(CASE WHEN extra_type IS NULL OR extra_type LIKE '%byes%' THEN 1 ELSE 0 END) - 
+        SUM(CASE WHEN extra_type = 'wides' THEN 1 ELSE 0 END) - 
+        SUM(CASE WHEN extra_type = 'noballs' THEN 1 ELSE 0 END)) % 6) AS Overs,
+        SUM(batsman_run) AS Runs_Conceding,
+        ROUND((CAST(SUM(batsman_run) AS FLOAT) / 
+        (COUNT(CASE WHEN extra_type IS NULL OR extra_type LIKE '%byes%' THEN 1 ELSE 0 END) - 
+        SUM(CASE WHEN extra_type = 'wides' THEN 1 ELSE 0 END) - 
+        SUM(CASE WHEN extra_type = 'noballs' THEN 1 ELSE 0 END))) * 6, 2) AS Economy,
+        SUM(CASE WHEN isWicketDelivery = 1 THEN 1 ELSE 0 END) AS Wickets,
         COUNT(CASE WHEN total_run = 0  THEN 1 END) AS Dots,
         COUNT(CASE WHEN extra_type = 'wides' THEN 1 END) AS Wides,
         COUNT(CASE WHEN extra_type = 'noballs' THEN 1 END) AS NoBalls,
@@ -139,8 +151,6 @@ def innings_by_innings_list_bowling(player_name, start_date, last_date):
 
     # Close the connection
     conn.close()
-    df['Economy'] = (df['runs_conceded'] * 6) / df['balls_bowled']
-    df['Economy'] = df['Economy'].round(2)
     return df
 
 def innings_by_innings_list_fieldings(name, start_date, end_date):
